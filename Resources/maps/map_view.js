@@ -11,151 +11,8 @@ var longitude = '';
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 
-// Set Distance filter. This dictates how often an event fires based on the distance
-// the device moves. This value is in meters.
+// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
 Titanium.Geolocation.distanceFilter = 7;
-
-//
-// NAVBAR BUTTONS
-//
-
-var removeAll = null;
-var atl = null;
-var sv = null;
-var sat = null;
-var std = null;
-var hyb = null;
-var zoomin = null;
-var zoomout = null;
-		
-var wireClickHandlers = function() {
-	removeAll.addEventListener('click', function() {
-		mapview.removeAllAnnotations();
-	});
-
-	atl.addEventListener('click', function() {
-		// set location to atlanta
-		mapview.setLocation(regionAtlanta);
-	
-		// activate annotation
-		mapview.selectAnnotation(mapview.annotations[0].title,true);
-		Ti.API.error("CLICKED ATL");
-	});
-	
-	sv.addEventListener('click', function() {
-		Ti.API.info('IN SV CHANGE');
-		// set location to sv
-		mapview.setLocation(regionSV);
-	
-		// activate annotation
-		mapview.selectAnnotation(mapview.annotations[1].title,true);
-	});
-	
-	sat.addEventListener('click',function() {
-		// set map type to satellite
-		mapview.setMapType(Titanium.Map.SATELLITE_TYPE);
-	});
-	
-	std.addEventListener('click',function() {
-		// set map type to standard
-		mapview.setMapType(Titanium.Map.STANDARD_TYPE);
-	});
-	
-	hyb.addEventListener('click',function() {
-		// set map type to hybrid
-		mapview.setMapType(Titanium.Map.HYBRID_TYPE);
-	});
-	
-	zoomin.addEventListener('click',function() {
-		mapview.zoom(1);
-	});
-	
-	zoomout.addEventListener('click',function() {
-		mapview.zoom(-1);
-	});
-}		
-
-if (!isAndroid) {
-	removeAll = Titanium.UI.createButton({
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
-		title:'Remove All'
-	});
-	win.rightNavButton = removeAll;
-
-	//
-	// TOOLBAR BUTTONS
-	//
-	
-	// button to change to ATL
-	atl = Titanium.UI.createButton({
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
-		title:'ATL'
-	});
-	// activate annotation
-	mapview.selectAnnotation(mapview.annotations[0].title,true);
-	
-	// button to change to SV	
-	sv = Titanium.UI.createButton({
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
-		title:'SV'
-	});
-	mapview.addEventListener('complete', function()
-	{
-		Ti.API.info("map has completed loaded region");
-	});
-	
-	
-	var flexSpace = Titanium.UI.createButton({
-		systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-	});
-	
-	// button to change map type to SAT
-	sat = Titanium.UI.createButton({
-		title:'Sat',
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-	});
-	// button to change map type to STD
-	std = Titanium.UI.createButton({
-		title:'Std',
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-	});
-	// button to change map type to HYBRID
-	hyb = Titanium.UI.createButton({
-		title:'Hyb',
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-	});
-	// button to zoom-in
-	zoomin = Titanium.UI.createButton({
-		title:'+',
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-	});
-	// button to zoom-out
-	zoomout = Titanium.UI.createButton({
-		title:'-',
-		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-	});
-	
-	wireClickHandlers();
-	
-	win.setToolbar([flexSpace,std,flexSpace,hyb,flexSpace,sat,flexSpace,atl,flexSpace,sv,flexSpace,zoomin,flexSpace,zoomout,flexSpace]);
-} else {
-	var activity = Ti.Android.currentActivity;
-	activity.onCreateOptionsMenu = function(e) {
-		var menu = e.menu;
-		
-		atl = menu.add({title : 'ATL'});
-		sv = menu.add({title : 'SV'});
-		sat = menu.add({title : 'Sat'});
-		std = menu.add({title : 'Std'});
-		hyb = menu.add({title : 'Hyb'});
-		zoomin = menu.add({title : "Zoom In"});
-		zoomout = menu.add({title : 'Zoom Out'});
-		removeAll = menu.add({title:'Remove All'});
-		
-		wireClickHandlers();
-	}
-}
-
 
 //This fires only ONCE.
 
@@ -164,7 +21,63 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
             Ti.API.log('error: ' + JSON.stringify(e.error) );
             return;
         }
- //This gets the current coordinates
+
+		/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
+			For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
+			folder. I don't know why, but it made a clean rebuild and it started adding the bars and acknowledging the
+			"Titanium.UI.iPhone" part of the code instead of declaring it "unknown".  */
+
+		//I believe that these declare the variables without having them set to anything.
+		var zoomin = null;
+		var zoomout = null;
+
+		/*I have no idea what the "wireClickHandlers" function is suppose to do; I copied this code from the Maps example
+		  from the Titanium Appcelerator KitchenSink. I think these just make the "zoom" variables become functions that
+		  affect the mapview - and that the "mapview.zoom" part actually details how it changes the map itself.*/
+
+		var wireClickHandlers = function() {
+			zoomin.addEventListener('click',function() {
+				mapview.zoom(1);
+			})
+			zoomout.addEventListener('click',function() {
+				mapview.zoom(-1);
+			})
+		}
+	  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android
+		 phone as is and needs to be adjusted. So (!isAndroid) = if it isn't the Android OS do the following. It was important to place anyways
+		because below, the zoom-in and zoom-out buttons need to have a different method. It is "menu.add" with a title. */
+if (!isAndroid) {
+		var flexSpace = Titanium.UI.createButton({
+			systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+		});
+
+		zoomin = Titanium.UI.createButton({
+			title:'+',
+			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+		});
+
+		zoomout = Titanium.UI.createButton({
+			title:'-',
+			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+		});
+
+		wireClickHandlers();
+		/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
+		   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
+		   how much spacing is wanted.*/
+		win.setToolbar([flexSpace,zoomin,zoomout]);
+		
+} else {
+	var activity = Titanium.Android.currentActivity;
+	activity.onCreateOptionsMenu = function(e) {
+		var menu = e.menu;
+		zoomin = menu.add({title : "Zoom In"});
+		zoomout = menu.add({title : "Zoom Out"});
+		wireClickHandlers();
+	}
+}
+
+ 		//This gets the current coordinates
 	    var longitude = e.coords.longitude;
 	    var latitude = e.coords.latitude;
 	    var altitude = e.coords.altitude;
@@ -188,8 +101,6 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 		//This is the actual part that allows for the map to be viewed while having tabs at the bottom
 		win.add(mapview);
 });
-
-
 
 Titanium.Geolocation.addEventListener('location', function(e) {
         if (e.error) {
