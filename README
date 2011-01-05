@@ -1,0 +1,16 @@
+This is the Graduate Thesis work of Hector Leiva. 
+
+I am developing an iPhone application using Titanium Appcelerator. The main functions of the application are to connect to an Amazon S3 server and upload user-generated audio files that are saved at the geo-location in which they are recorded. Then to have users physically be in the same geo-location where the original audio recording took place in order to listen to them as they are being streamed from the Amazon S3 Server.
+
+
+----------------------------------
+Stuff our legal folk make us say:
+
+Appcelerator, Appcelerator Titanium and associated marks and logos are 
+trademarks of Appcelerator, Inc. 
+
+Titanium is Copyright (c) 2009-2010 by Appcelerator, Inc. All Rights Reserved.
+
+Titanium is licensed under the Apache Public License (Version 2). Please
+see the LICENSE file for the full license.
+
