@@ -1,3 +1,5 @@
+//Changing the win to = Ti.Ui.currentWindow, just allowed me to declare anytime I wanted to modify something to appear in this window to just
+//add "win." whatever else instead of having to write "Titanium.UI.currentWindow." then "add." over and over.
 var win = Titanium.UI.currentWindow;
 
 var isAndroid = false;
@@ -15,7 +17,6 @@ Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 Titanium.Geolocation.distanceFilter = 7;
 
 //This fires only ONCE.
-
 Titanium.Geolocation.getCurrentPosition(function(e) {
         if (e.error) {
             Ti.API.log('error: ' + JSON.stringify(e.error) );
@@ -64,7 +65,7 @@ if (!isAndroid) {
 		wireClickHandlers();
 		/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
 		   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
-		   how much spacing is wanted.*/
+		   how much spacing is wanted. */
 		win.setToolbar([flexSpace,zoomin,zoomout]);
 		
 } else {
@@ -91,7 +92,7 @@ if (!isAndroid) {
 		var mapview = Titanium.Map.createView({
 		mapType: Titanium.Map.STANDARD_TYPE,
 		//The following are objects and need to have values placed. LatitudeDelta & LongitudeDelta have values set to be extremely close. The larger
-		//the number, the farther away it will be on the map.
+		//the number, the larger the map will be.
 		region: {latitude: latitude, longitude: longitude, latitudeDelta:0.001, longitudeDelta:0.001},    
 		//The following are Booleans, so they can only be true or false
 		animate:true,
