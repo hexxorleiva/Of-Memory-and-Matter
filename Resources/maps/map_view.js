@@ -101,28 +101,31 @@ if (!isAndroid) {
 		});
 		//This is the actual part that allows for the map to be viewed while having tabs at the bottom
 		win.add(mapview);
+		
 });
 
-Titanium.Geolocation.addEventListener('location', function(e) {
-        if (e.error) {
-            Ti.API.log('error: ' + JSON.stringify(e.error) );
-            return;
-        }
-else
-{
-		Titanium.UI.currentWindow.close(mapview);
-		var longitude = e.coords.longitude;
-		var latitude = e.coords.latitude;
-		var altitude = e.coords.altitude;
-		var heading = e.coords.heading;
-		var accuracy = e.coords.accuracy;
-		var speed = e.coords.speed;
-		var timestamp = e.coords.timestamp;
-		var altitudeAccuracy = e.coords.altitudeAccuracy;
-		
-		win.add(mapview)
-}
-		});
+// Sample code taken from https://appcelerator.lighthouseapp.com/projects/32238/tickets/1122-geolocation-listener-fires-repeatedly
+		/*
+         EVENT LISTENER FOR GEO EVENTS - THIS WILL FIRE REPEATEDLY (BASED ON DISTANCE FILTER)
+        */
 
-//win.add(mapview);
-//win.open();
+        Titanium.Geolocation.addEventListener('location', function(e){
+            if (e.error) {
+                Ti.API.error('Geolocation Error');
+                Ti.API.error('error:' + JSON.stringify(e.error));
+                return;
+            };
+            
+            // get values from geolocation call
+		    var longitude = e.coords.longitude;
+		    var latitude = e.coords.latitude;
+		    var altitude = e.coords.altitude;
+		    var heading = e.coords.heading;
+		    var accuracy = e.coords.accuracy;
+		    var speed = e.coords.speed;
+		    var timestamp = e.coords.timestamp;
+		    var altitudeAccuracy = e.coords.altitudeAccuracy;
+			var timestamp = e.coords.timestamp;
+            
+         	win.add(mapview);
+});
