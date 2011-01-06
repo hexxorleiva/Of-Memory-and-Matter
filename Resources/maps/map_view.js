@@ -6,23 +6,6 @@ var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
 	isAndroid = true;
 }
-
-var latitude = '';
-var longitude = '';
-
-Titanium.Geolocation.purpose = "Recieve User Location";
-Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-
-// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
-Titanium.Geolocation.distanceFilter = 7;
-
-//This fires only ONCE.
-Titanium.Geolocation.getCurrentPosition(function(e) {
-        if (e.error) {
-            Ti.API.log('error: ' + JSON.stringify(e.error) );
-            return;
-        }
-
 		/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
 			For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
 			folder. I don't know why, but it made a clean rebuild and it started adding the bars and acknowledging the
@@ -53,12 +36,12 @@ if (!isAndroid) {
 		});
 
 		zoomin = Titanium.UI.createButton({
-			title:'+',
+			title:'Zoom +',
 			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
 		});
 
 		zoomout = Titanium.UI.createButton({
-			title:'-',
+			title:'Zoom -',
 			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
 		});
 
@@ -70,7 +53,7 @@ if (!isAndroid) {
 		
 } else {
 	var activity = Titanium.Android.currentActivity;
-	activity.onCreateOptionsMenu = function(e) {
+	activity.onCreateOptionsMenu = function() {
 		var menu = e.menu;
 		zoomin = menu.add({title : "Zoom In"});
 		zoomout = menu.add({title : "Zoom Out"});
@@ -78,54 +61,60 @@ if (!isAndroid) {
 	}
 }
 
- 		//This gets the current coordinates
-	    var longitude = e.coords.longitude;
-	    var latitude = e.coords.latitude;
-	    var altitude = e.coords.altitude;
-	    var heading = e.coords.heading;
-	    var accuracy = e.coords.accuracy;
-	    var speed = e.coords.speed;
-	    var timestamp = e.coords.timestamp;
-	    var altitudeAccuracy = e.coords.altitudeAccuracy;
+//
+// Begin Geo Location
+//
+
+Titanium.Geolocation.purpose = "Recieve User Location";
+Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
+
+// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
+Titanium.Geolocation.distanceFilter = 10;
+
+//This fires only ONCE.
+var longitude = Titanium.Geolocation.getCurrentPosition(function(e) {
+        if (e.error) {
+            Ti.API.log('error: ' + JSON.stringify(e.error) );
+            return;
+        }
+		//This gets the current coordinates
+		e.coords.longitude;
+/*		var latitude = e.coords.latitude;
+		var altitude = e.coords.altitude;
+		var heading = e.coords.heading;
+		var accuracy = e.coords.accuracy;
+		var speed = e.coords.speed;
 		var timestamp = e.coords.timestamp;
-		//This section builds the physical viewing map	
-		var mapview = Titanium.Map.createView({
-		mapType: Titanium.Map.STANDARD_TYPE,
-		//The following are objects and need to have values placed. LatitudeDelta & LongitudeDelta have values set to be extremely close. The larger
-		//the number, the larger the map will be.
-		region: {latitude: latitude, longitude: longitude, latitudeDelta:0.001, longitudeDelta:0.001},    
-		//The following are Booleans, so they can only be true or false
-		animate:true,
-		regionFit:true,
-		userLocation:true,
-		});
-		//This is the actual part that allows for the map to be viewed while having tabs at the bottom
-		win.add(mapview);
+		var altitudeAccuracy = e.coords.altitudeAccuracy; */
+
 		
 });
 
-// Sample code taken from https://appcelerator.lighthouseapp.com/projects/32238/tickets/1122-geolocation-listener-fires-repeatedly
-		/*
-         EVENT LISTENER FOR GEO EVENTS - THIS WILL FIRE REPEATEDLY (BASED ON DISTANCE FILTER)
-        */
+var latitude = Titanium.Geolocation.getCurrentPosition(function(e) {
+        if (e.error) {
+            Ti.API.log('error: ' + JSON.stringify(e.error) );
+            return;
+        }
+		e.coords.latitude;
+})
 
-        Titanium.Geolocation.addEventListener('location', function(e){
-            if (e.error) {
-                Ti.API.error('Geolocation Error');
-                Ti.API.error('error:' + JSON.stringify(e.error));
-                return;
-            };
-            
-            // get values from geolocation call
-		    var longitude = e.coords.longitude;
-		    var latitude = e.coords.latitude;
-		    var altitude = e.coords.altitude;
-		    var heading = e.coords.heading;
-		    var accuracy = e.coords.accuracy;
-		    var speed = e.coords.speed;
-		    var timestamp = e.coords.timestamp;
-		    var altitudeAccuracy = e.coords.altitudeAccuracy;
-			var timestamp = e.coords.timestamp;
-            
-         	win.add(mapview);
+//
+// Begin drawing map
+//
+var mapview = Titanium.Map.createView({
+	mapType: Titanium.Map.STANDARD_TYPE,
+	// Latitude and Longitude Delta values are set for default zoom. They are in meters.
+	//The following are booleans
+	animate:true,
+	regionFit:true,
+	userLocation:true,
+	region: {latitude: latitude, longitude: longitude, latitudeDelta:.01, longitudeDelta:.01},    
 });
+
+
+
+/*mapview.addEventListener('regionChanged',function() {
+	region:{latitude, longitude}
+	});*/
+	
+win.add(mapview);
