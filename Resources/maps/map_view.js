@@ -72,49 +72,35 @@ Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 Titanium.Geolocation.distanceFilter = 10;
 
 //This fires only ONCE.
-var longitude = Titanium.Geolocation.getCurrentPosition(function(e) {
+var my_location = Titanium.Geolocation.getCurrentPosition(function(e) {
         if (e.error) {
             Ti.API.log('error: ' + JSON.stringify(e.error) );
             return;
         }
 		//This gets the current coordinates
-		e.coords.longitude;
-/*		var latitude = e.coords.latitude;
-		var altitude = e.coords.altitude;
-		var heading = e.coords.heading;
-		var accuracy = e.coords.accuracy;
-		var speed = e.coords.speed;
-		var timestamp = e.coords.timestamp;
-		var altitudeAccuracy = e.coords.altitudeAccuracy; */
-
+		var current_longitude = e.coords.longitude;
+		var current_latitude = e.coords.latitude;
+		var current_altitude = e.coords.altitude;
+		var current_heading = e.coords.heading;
+		var current_accuracy = e.coords.accuracy;
+		var current_speed = e.coords.speed;
+		var current_timestamp = e.coords.timestamp;
+		var current_altitudeAccuracy = e.coords.altitudeAccuracy;
+		//
+		// Begin drawing map
+		//
+		var mapview = Titanium.Map.createView({
+			mapType: Titanium.Map.STANDARD_TYPE,
+			//The following are booleans
+			animate:true,
+			regionFit:true,
+			userLocation:true,
+			// Latitude and Longitude Delta values are set for default zoom. They are in meters.
+			region: {latitude: current_latitude, longitude: current_longitude, latitudeDelta:.01, longitudeDelta:.01},
+		});
+		mapview.addEventListener('regionChanged', function(){
+			
+		});
+	    win.add(mapview);
 		
 });
-
-var latitude = Titanium.Geolocation.getCurrentPosition(function(e) {
-        if (e.error) {
-            Ti.API.log('error: ' + JSON.stringify(e.error) );
-            return;
-        }
-		e.coords.latitude;
-})
-
-//
-// Begin drawing map
-//
-var mapview = Titanium.Map.createView({
-	mapType: Titanium.Map.STANDARD_TYPE,
-	// Latitude and Longitude Delta values are set for default zoom. They are in meters.
-	//The following are booleans
-	animate:true,
-	regionFit:true,
-	userLocation:true,
-	region: {latitude: latitude, longitude: longitude, latitudeDelta:.01, longitudeDelta:.01},    
-});
-
-
-
-/*mapview.addEventListener('regionChanged',function() {
-	region:{latitude, longitude}
-	});*/
-	
-win.add(mapview);
