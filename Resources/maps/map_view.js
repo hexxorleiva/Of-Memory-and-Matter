@@ -34,8 +34,8 @@ Titanium.Geolocation.getCurrentPosition(function(e){
             latitude: e.coords.latitude,
             longitude: e.coords.longitude,
             animate:true,
-            latitudeDelta:0.001,
-            longitudeDelta:0.001
+            latitudeDelta:0.005,
+            longitudeDelta:0.005
         };
         mapview.setLocation(region);
 });
