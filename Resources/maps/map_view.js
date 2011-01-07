@@ -1,12 +1,13 @@
 //Changing the win to = Ti.Ui.currentWindow, just allowed me to declare anytime I wanted to modify something to appear in this window to just
 //add "win." whatever else instead of having to write "Titanium.UI.currentWindow." then "add." over and over.
 var win = Titanium.UI.currentWindow;
+var latitude;
+var longitude;
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
 	isAndroid = true;
 }
-
 //
 // Begin Geo Location
 //
@@ -16,21 +17,35 @@ Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 
 // Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
 Titanium.Geolocation.distanceFilter = 10;
-		
-		Titanium.Geolocation.addEventListener('location', function(e){
-			if (e.error) {
-		        Ti.API.log('error: ' + JSON.stringify(e.error) );
-		        return;
-		    }
-			//This gets the current coordinates
-			var current_longitude = e.coords.longitude;
-			var current_latitude = e.coords.latitude;
-			var current_altitude = e.coords.altitude;
-			var current_heading = e.coords.heading;
-			var current_accuracy = e.coords.accuracy;
-			var current_speed = e.coords.speed;
-			var current_timestamp = e.coords.timestamp;
-			var current_altitudeAccuracy = e.coords.altitudeAccuracy;
+//set the mapview with the current location
+var mapview = Titanium.Map.createView({
+    mapType: Titanium.Map.STANDARD_TYPE,
+    animate:true,
+    region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1},
+    regionFit:true,
+    userLocation:true,
+    visible: true,
+});
+ 
+function getLocation(){
+//Get the current position and set it to the mapview
+Titanium.Geolocation.getCurrentPosition(function(e){
+        var region={
+            latitude: e.coords.latitude,
+            longitude: e.coords.longitude,
+            animate:true,
+            latitudeDelta:0.001,
+            longitudeDelta:0.001
+        };
+        mapview.setLocation(region);
+});
+}
+ 
+win.add(mapview);
+ 
+Titanium.Geolocation.addEventListener('location',function(){
+    getLocation();
+});
 			
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
 					For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
@@ -86,17 +101,4 @@ Titanium.Geolocation.distanceFilter = 10;
 				wireClickHandlers();
 			}
 		}
-		
-		var mapview = Titanium.Map.createView({
-			mapType: Titanium.Map.STANDARD_TYPE,
-			//The following are booleans
-			animate:true,
-			regionFit:true,
-			userLocation:true,
-			// Latitude and Longitude Delta values are set for default zoom. They are in meters.
-			region: {latitude: current_latitude, longitude: current_longitude, latitudeDelta:.001, longitudeDelta:.001},
-		});
 
-		win.add(mapview);
-
-		});
