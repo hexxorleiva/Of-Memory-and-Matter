@@ -1,5 +1,5 @@
 var win = Titanium.UI.currentWindow;
-win.backgroundColor = '#ccc';
+win.backgroundColor = '#000';
 
 // initialize to all modes
 win.orientationModes = [

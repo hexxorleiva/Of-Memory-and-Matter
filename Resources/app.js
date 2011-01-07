@@ -43,7 +43,7 @@ var win2 = Titanium.UI.createWindow({
 	id:'win2',
 	url:'maps/map_view.js',
 	title:'Map',
-	backgroundColor:'#fff'
+	backgroundColor:'#000'
 });
 var tab2 = Titanium.UI.createTab({
 	id:'tab2',
