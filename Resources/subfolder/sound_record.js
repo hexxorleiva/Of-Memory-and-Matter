@@ -26,7 +26,7 @@ var sound;
 
 
 var label = Titanium.UI.createLabel({
-	text:'',
+	text:'some label',
 	top:150,
 	color:'#999',
 	textAlign:'center',
