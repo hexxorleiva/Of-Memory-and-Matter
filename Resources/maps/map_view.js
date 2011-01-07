@@ -71,8 +71,10 @@ Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 // Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
 Titanium.Geolocation.distanceFilter = 10;
 
+
+
 //This fires only ONCE.
-var my_location = Titanium.Geolocation.getCurrentPosition(function(e) {
+Titanium.Geolocation.getCurrentPosition(function(e) {
         if (e.error) {
             Ti.API.log('error: ' + JSON.stringify(e.error) );
             return;
@@ -86,6 +88,7 @@ var my_location = Titanium.Geolocation.getCurrentPosition(function(e) {
 		var current_speed = e.coords.speed;
 		var current_timestamp = e.coords.timestamp;
 		var current_altitudeAccuracy = e.coords.altitudeAccuracy;
+		
 		//
 		// Begin drawing map
 		//
@@ -96,11 +99,30 @@ var my_location = Titanium.Geolocation.getCurrentPosition(function(e) {
 			regionFit:true,
 			userLocation:true,
 			// Latitude and Longitude Delta values are set for default zoom. They are in meters.
-			region: {latitude: current_latitude, longitude: current_longitude, latitudeDelta:.01, longitudeDelta:.01},
+			region: {latitude: current_latitude, longitude: current_longitude, latitudeDelta:.001, longitudeDelta:.001},
 		});
-		mapview.addEventListener('regionChanged', function(){
-			
-		});
-	    win.add(mapview);
 		
+		Titanium.Geolocation.addEventListener('location', function(e){
+			if (e.error) {
+		        Ti.API.log('error: ' + JSON.stringify(e.error) );
+		        return;
+		    }
+			//This gets the current coordinates
+			var current_longitude = e.coords.longitude;
+			var current_latitude = e.coords.latitude;
+			var current_altitude = e.coords.altitude;
+			var current_heading = e.coords.heading;
+			var current_accuracy = e.coords.accuracy;
+			var current_speed = e.coords.speed;
+			var current_timestamp = e.coords.timestamp;
+			var current_altitudeAccuracy = e.coords.altitudeAccuracy;
+
+		});
+
+		win.add(mapview);
 });
+
+
+
+
+
