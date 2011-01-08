@@ -29,7 +29,8 @@ var mapview = Titanium.Map.createView({
  
 //function getLocation(){
 //Get the current position and set it to the mapview
-Titanium.Geolocation.getCurrentPosition(function(e){
+function currentLocation() {
+	Titanium.Geolocation.getCurrentPosition(function(e){
         var region={
             latitude: e.coords.latitude,
             longitude: e.coords.longitude,
@@ -39,15 +40,18 @@ Titanium.Geolocation.getCurrentPosition(function(e){
         };
         mapview.setLocation(region);
 	});
-//}
+};
  
 win.add(mapview);
 
 //Suggestion from the forums: "getCurrentPosition" could just update once. I am testing if adding
 //"Titanium.Geolocation.location" will create updated values to reflect the actual current location (and values).
+/*
+
+There doesn't seem to be a Geolocation.location function through Titanium
 
 function currentLocation(){
-	Titanioum.Geolocation.location(function(e){
+	Titanium.Geolocation.location(function(e){
 		var currentRegion={
 			latitude: e.coords.latitude,
 			longitude: e.coords.longitude,
@@ -57,8 +61,8 @@ function currentLocation(){
 		};
 		mapview.setLocation(currentRegion);
 	});
-}
- 
+};
+ */
 Titanium.Geolocation.addEventListener('location',function(){
     currentLocation();
 //getLocation();
@@ -117,5 +121,4 @@ Titanium.Geolocation.addEventListener('location',function(){
 				zoomout = menu.add({title : "Zoom Out"});
 				wireClickHandlers();
 			}
-		}
-
+		};
