@@ -28,7 +28,7 @@ var tab1 = Titanium.UI.createTab({
 var label1 = Titanium.UI.createLabel({
 	id:'label1',
 	color:'#fff',
-	text:'Introduction',
+	text:'Intro',
 	font:{fontSize:20,fontFamily:'Helvetica Neue'},
 	textAlign:'center',
 	width:'auto'
@@ -57,7 +57,7 @@ var label2 = Titanium.UI.createLabel({
 	color:'#999',
 	font:{fontSize:16,fontfamily:'Helvetica Neue'},
 	textAlign:'center',
-	width: 300
+	width: 'auto'
 });
 
 win2.add(label2);
@@ -84,44 +84,18 @@ var label3 = Titanium.UI.createLabel({
 	text:'Sound',
 	font:{fontSize:15,fontfamily:'Helvetica Neue'},
 	textAlign:'center',
-	width: 300	
+	width: 'auto'	
 });
 
 win3.add(label3);
 
 //
-//
-
-var win4 = Titanium.UI.createWindow({
-	id:'win4',
-	url:'subfolder/sound_record.js',
-	title:'Photos',
-	backgroundColor:'#fff'
-});
-var tab4 = Titanium.UI.createTab({
-	id:'tab3',
-	icon:'KS_nav_ui.png',
-	title:'Photo Gallery',
-	window:win4
-});
-
-var label4 = Titanium.UI.createLabel({
-	id:'label4',
-	color:'#999',
-	text:'Photo Gallery',
-	font:{fontSize:15,fontfamily:'Helvetica Neue'},
-	textAlign:'center',
-	width: 300	
-});
-
-win4.add(label4);
 
 //
 //  add tabs
 //
 tabGroup.addTab(tab1);  
 tabGroup.addTab(tab2);
-tabGroup.addTab(tab3);
 tabGroup.addTab(tab3);
 
 // open tab group

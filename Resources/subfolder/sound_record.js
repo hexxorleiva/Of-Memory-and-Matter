@@ -108,7 +108,7 @@ Ti.Media.addEventListener('volume',function(e)
 */
 
 //This is showcasing misc. information about the audio variables.
-/*
+
 var duration = 0;
 
 function showLevels()
@@ -118,7 +118,7 @@ function showLevels()
 	duration++;
 	label.text = 'duration: '+duration+' seconds\npeak power: '+peak+'\navg power: '+avg;
 }
-*/
+
 
 var b1 = Titanium.UI.createButton({
 	title:'Start Recording',
@@ -133,6 +133,7 @@ b1.addEventListener('click', function()
 		file = recording.stop();
 		b1.title = "Start Recording";
 		b2.show();
+		pause.hide();
 		clearInterval(timer);
 		Ti.Media.stopMicrophoneMonitor();
 	}
@@ -148,6 +149,7 @@ b1.addEventListener('click', function()
 		b1.title = "Stop Recording";
 		recording.start();
 		b2.hide();
+		pause.show();
 		Ti.Media.startMicrophoneMonitor();
 		duration = 0;
 		timer = setInterval(showLevels,1000);
@@ -155,12 +157,38 @@ b1.addEventListener('click', function()
 });
 win.add(b1);
 
+//Pause button
+
+var pause = Titanium.UI.createButton({
+	title:'Pause recording',
+	width:200,
+	height:40,
+	top:80
+});
+win.add(pause);
+pause.hide();
+
+pause.addEventListener('click', function() {
+	if (recording.paused) {
+		pause.title = 'Pause recording';
+		recording.resume();
+		timer = setInterval(showLevels,1000);
+	}
+	else {
+		pause.title = 'Unpause recording';
+		recording.pause();
+		clearInterval(timer);
+	}
+});
+
 var b2 = Titanium.UI.createButton({
 	title:'Playback Recording',
 	width:200,
 	height:40,
 	top:80
 });
+
+//
 
 win.add(b2);
 b2.addEventListener('click', function()
@@ -184,6 +212,30 @@ b2.addEventListener('click', function()
 		b2.title = 'Stop Playback';
 	}
 });
+
+// Adding my own UPLOAD button to the Sound Record Section
+
+var b3 = Titanium.UI.createButton({
+	title:'Upload',
+	width:200,
+	height:40,
+	top:140
+});
+win.add(b3);
+b3.addEventListener('click', function()
+{
+	if (sound && sound.playing)
+	{
+		sound.stop();
+		sound.release();
+		sound = null;
+		b3.title = 'Uploading';
+		
+		//This is the code to try and upload to a webserver Gathered from 
+	}
+});
+
+//
 
 var switchLabel = Titanium.UI.createLabel({
 	text:'Hi-fidelity:',
