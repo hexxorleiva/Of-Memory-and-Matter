@@ -24,7 +24,7 @@ var file;
 var timer;
 var sound;
 
-
+/*
 var label = Titanium.UI.createLabel({
 	text:'some label',
 	top:150,
@@ -36,7 +36,7 @@ var label = Titanium.UI.createLabel({
 
 win.add(label);
 
-
+*/
 //I think this is a part of the script that details which sound input is being used.
 /*
 function lineTypeToStr()
@@ -224,16 +224,35 @@ var b3 = Titanium.UI.createButton({
 win.add(b3);
 b3.addEventListener('click', function()
 {
-	if (sound && sound.playing)
+	file  = recording.stop();
+	start.title = "Recorded: " + file.size;
+	
+	var xhr = Titanium.Network.CreateHTTPClient(); // Returns an instance of HTTPClient
+	//The handling of network communication is handled asynchronously, since you would not want your application to hang while waiting on an HTTP request to return.
+	
+	xhr.onerror = function(e) //this fires if Titanium/the native SDK cannot successfully retrieve a resource
 	{
-		sound.stop();
-		sound.release();
-		sound = null;
-		b3.title = 'Uploading';
-		
-		//This is the code to try and upload to a webserver Gathered from 
-	}
-});
+		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+		Titanium.API.info('In Error' + e.error);
+	};
+	xhr.setTimeout(20000);
+	xhr.onload = function(e) //this fires when your request returns successfully
+	{
+		Titanium.UI.createAlertDialog({title:'Sucess', message:'status code' + this.status}).show();
+		Titanium.API.info('In Onload' + this.status + 'readyState' + this.readyState);
+	};
+	xhr.onsendstream = function(e)
+	{
+		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+	};
+	
+	xhr.open('POST', /*URL,*/)
+	xhr.send({
+		thesound:sound,
+		username:''
+		password:''
+	});
+}
 
 //
 
