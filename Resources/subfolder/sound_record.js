@@ -246,11 +246,11 @@ b3.addEventListener('click', function()
 		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 	};
 	
-	xhr.open('POST', /*URL,*/)
+	xhr.open('POST', 'http://hectorleiva.com/audio/upload_audio.php', false) //false makes it synchronous
 	xhr.send({
 		thesound:sound,
-		username:''
-		password:''
+		username:'',
+		password:'',
 	});
 }
 
