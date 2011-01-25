@@ -249,8 +249,8 @@ b3.addEventListener('click', function()
 	xhr.open('POST', 'http://hectorleiva.com/audio/upload_audio.php', false); //false makes it synchronous
 	xhr.send({
 		thesound:sound,
-		username:'hectlei8',
-		password:'Rrby8D5Y37'
+		username:'',
+		password:''
 	});
 });
 
