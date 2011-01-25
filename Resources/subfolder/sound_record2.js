@@ -166,6 +166,7 @@ upload.addEventListener('click', function()
 		Titanium.API.info('In Error' + e.error);
 	};
 	xhr.setTimeout(20000);
+	
 	xhr.onload = function(e) //this fires when your request returns successfully
 	{
 		Titanium.UI.createAlertDialog({title:'Success', message:'status code' + this.status}).show();
@@ -177,9 +178,9 @@ upload.addEventListener('click', function()
 		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 	};
 	
-	xhr.open('POST', 'http://localhost/', false); //false makes it synchronous
+	xhr.open('POST', 'http://localhost/audio', false); //false makes it synchronous
 	xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	xhr.send({media1: i1});
+	xhr.send(i1);
 });
 win.add(upload);
 
