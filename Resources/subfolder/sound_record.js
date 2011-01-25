@@ -23,11 +23,12 @@ Ti.Media.addEventListener('recordinginput', function(e) {
 var file;
 var timer;
 var sound;
+var duration = 0;
 
-/*
+
 var label = Titanium.UI.createLabel({
-	text:'some label',
-	top:150,
+	text:'',
+	top:290,
 	color:'#999',
 	textAlign:'center',
 	width:'auto',
@@ -36,7 +37,7 @@ var label = Titanium.UI.createLabel({
 
 win.add(label);
 
-*/
+
 //I think this is a part of the script that details which sound input is being used.
 /*
 function lineTypeToStr()
@@ -108,8 +109,6 @@ Ti.Media.addEventListener('volume',function(e)
 */
 
 //This is showcasing misc. information about the audio variables.
-
-var duration = 0;
 
 function showLevels()
 {
@@ -222,6 +221,7 @@ var b3 = Titanium.UI.createButton({
 	top:140
 });
 win.add(b3);
+
 b3.addEventListener('click', function()
 {
 	file  = recording.stop();
@@ -246,13 +246,13 @@ b3.addEventListener('click', function()
 		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 	};
 	
-	xhr.open('POST', 'http://hectorleiva.com/audio/upload_audio.php', false) //false makes it synchronous
+	xhr.open('POST', 'http://hectorleiva.com/audio/upload_audio.php', false); //false makes it synchronous
 	xhr.send({
 		thesound:sound,
-		username:'',
-		password:'',
+		username:'hectlei8',
+		password:'Rrby8D5Y37'
 	});
-}
+});
 
 //
 
@@ -266,7 +266,7 @@ var switchLabel = Titanium.UI.createLabel({
 });
 var switcher = Titanium.UI.createSwitch({
 	value:false,
-	bottom:80,
+	bottom:80
 });
 
 switcher.addEventListener('change',function(e)
