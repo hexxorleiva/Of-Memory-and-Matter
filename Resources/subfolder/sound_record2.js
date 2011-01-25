@@ -152,7 +152,8 @@ var upload = Titanium.UI.createButton({
 });
 upload.addEventListener('click', function()
 {
-	var i1 = file.read();
+	var file = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory,'cricket.wav');
+	// load from file object
 	//file.title = "Recorded: " + file.size;
 	
 	//Trying to just upload "File" since that contains that actual cricket.wav
@@ -179,8 +180,9 @@ upload.addEventListener('click', function()
 	};
 	
 	xhr.open('POST', 'http://localhost/audio', false); //false makes it synchronous
-	xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	xhr.send(i1);
+	//xhr.setRequestHeader("Content-Type", "audio/x-wav");
+	xhr.getResponseHeader('Content-type', 'audio/x-wav');
+	xhr.send({media: file});
 });
 win.add(upload);
 
