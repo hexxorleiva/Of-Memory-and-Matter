@@ -24,7 +24,7 @@ var mapview = Titanium.Map.createView({
     region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1},
     regionFit:true,
     userLocation:true,
-    visible: true,
+    visible: true
 });
  
 //function getLocation(){
@@ -84,11 +84,11 @@ Titanium.Geolocation.addEventListener('location',function(){
 				var wireClickHandlers = function() {
 					zoomin.addEventListener('click',function() {
 						mapview.zoom(1);
-					})
+					});
 					zoomout.addEventListener('click',function() {
 						mapview.zoom(-1);
-					})
-				}
+					});
+				};
 			  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android
 				 phone as is and needs to be adjusted. So (!isAndroid) = if it isn't the Android OS do the following. It was important to place anyways
 				because below, the zoom-in and zoom-out buttons need to have a different method. It is "menu.add" with a title. */
@@ -120,5 +120,5 @@ Titanium.Geolocation.addEventListener('location',function(){
 				zoomin = menu.add({title : "Zoom In"});
 				zoomout = menu.add({title : "Zoom Out"});
 				wireClickHandlers();
-			}
+			};
 		};

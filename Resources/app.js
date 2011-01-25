@@ -67,7 +67,7 @@ win2.add(label2);
 
 var win3 = Titanium.UI.createWindow({
 	id:'win3',
-	url:'subfolder/sound_record.js',
+	url:'subfolder/sound_record2.js',
 	title:'Recording Sound',
 	backgroundColor:'#fff'
 });
@@ -81,7 +81,7 @@ var tab3 = Titanium.UI.createTab({
 var label3 = Titanium.UI.createLabel({
 	id:'label3',
 	color:'#999',
-	text:'Sound',
+	text:'',
 	font:{fontSize:15,fontfamily:'Helvetica Neue'},
 	textAlign:'center',
 	width: 'auto'	

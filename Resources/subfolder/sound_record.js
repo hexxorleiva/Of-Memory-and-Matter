@@ -225,9 +225,9 @@ win.add(b3);
 b3.addEventListener('click', function()
 {
 	file  = recording.stop();
-	start.title = "Recorded: " + file.size;
+	//start.title = "Recorded: " + file.size;
 	
-	var xhr = Titanium.Network.CreateHTTPClient(); // Returns an instance of HTTPClient
+	var xhr = Titanium.Network.createHTTPClient(); // Returns an instance of HTTPClient
 	//The handling of network communication is handled asynchronously, since you would not want your application to hang while waiting on an HTTP request to return.
 	
 	xhr.onerror = function(e) //this fires if Titanium/the native SDK cannot successfully retrieve a resource
@@ -238,7 +238,7 @@ b3.addEventListener('click', function()
 	xhr.setTimeout(20000);
 	xhr.onload = function(e) //this fires when your request returns successfully
 	{
-		Titanium.UI.createAlertDialog({title:'Sucess', message:'status code' + this.status}).show();
+		Titanium.UI.createAlertDialog({title:'Success', message:'status code' + this.status}).show();
 		Titanium.API.info('In Onload' + this.status + 'readyState' + this.readyState);
 	};
 	xhr.onsendstream = function(e)
@@ -246,12 +246,12 @@ b3.addEventListener('click', function()
 		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 	};
 	
-	xhr.open('POST', 'http://hectorleiva.com/audio/upload_audio.php', false); //false makes it synchronous
-	xhr.send({
-		thesound:sound,
-		username:'',
-		password:''
-	});
+	xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
+	//adding new content-type requests
+	xhr.setRequestHeader("Content-Type", "audio/x-wav");
+	
+	//send the data
+	xhr.send(file);
 });
 
 //
