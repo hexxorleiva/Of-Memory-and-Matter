@@ -223,10 +223,15 @@ var b3 = Titanium.UI.createButton({
 win.add(b3);
 
 b3.addEventListener('click', function()
-{
-	file  = recording.stop();
-	//start.title = "Recorded: " + file.size;
-	
+{	
+		var fileSound = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, file);
+		
+		audio = fileSound.read();
+		
+		var payload = {
+			"media": audio,
+			"name": sound
+	};
 	var xhr = Titanium.Network.createHTTPClient(); // Returns an instance of HTTPClient
 	//The handling of network communication is handled asynchronously, since you would not want your application to hang while waiting on an HTTP request to return.
 	
@@ -246,12 +251,11 @@ b3.addEventListener('click', function()
 		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 	};
 	
-	xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
+	xhr.open('POST', 'http://localhost/upload_audio2.php', false); //false makes it synchronous
 	//adding new content-type requests
 	xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	
 	//send the data
-	xhr.send(file);
+	xhr.send(payload);
 });
 
 //

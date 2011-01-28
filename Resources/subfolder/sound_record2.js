@@ -1,8 +1,20 @@
 var win = Titanium.UI.currentWindow;
+//Added as this based on the set-up from oil reporter code on github
+var audioSample = 'cricket.wav';
+var file = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, audioSample);
+//Added as this based on the set-up from oil reporter code on github
+//This I think declares that a variable called "audio" contains within it the file referenced above to get the same from the "Resources" Folder
+audio = file.read();
 
-var file = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory,'cricket.wav');
 // load from file object
 var sound = Titanium.Media.createSound({sound:file});
+
+//Added as this based on the set-up from the oil reporter code on github
+//I believe this is the syntax of declaring within JSON what the final upload blob will become with media and name being declarations.
+var payload = {
+	"media": audio,
+	"name": audioSample
+};
 
 //
 // PLAY
@@ -144,7 +156,7 @@ win.add(looping);
 // Personal Upload Button
 //
 var upload = Titanium.UI.createButton({
-	title:'Upload',
+	title:'Uploading',
 	height:40,
 	width:145,
 	right:10,
@@ -152,15 +164,8 @@ var upload = Titanium.UI.createButton({
 });
 upload.addEventListener('click', function()
 {
-	var file = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory,'cricket.wav');
-	// load from file object
-	//file.title = "Recorded: " + file.size;
-	
-	//Trying to just upload "File" since that contains that actual cricket.wav
-	
 	var xhr = Titanium.Network.createHTTPClient(); // Returns an instance of HTTPClient
 	//The handling of network communication is handled asynchronously, since you would not want your application to hang while waiting on an HTTP request to return.
-	
 	xhr.onerror = function(e) //this fires if Titanium/the native SDK cannot successfully retrieve a resource
 	{
 		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
@@ -168,21 +173,21 @@ upload.addEventListener('click', function()
 	};
 	xhr.setTimeout(20000);
 	
+	xhr.onsendstream = function(e)
+	{
+		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+	};
+
 	xhr.onload = function(e) //this fires when your request returns successfully
 	{
 		Titanium.UI.createAlertDialog({title:'Success', message:'status code' + this.status}).show();
 		Titanium.API.info('In Onload' + this.status + 'readyState' + this.readyState);
 	};
 	
-	xhr.onsendstream = function(e)
-	{
-		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
-	};
+	xhr.open('POST', 'http://localhost/upload_audio2.php', false); //false makes it synchronous
+	xhr.setRequestHeader("Content-Type", "audio/x-wav");
+	xhr.send(payload);
 	
-	xhr.open('POST', 'http://localhost/audio', false); //false makes it synchronous
-	//xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	xhr.getResponseHeader('Content-type', 'audio/x-wav');
-	xhr.send({media: file});
 });
 win.add(upload);
 
