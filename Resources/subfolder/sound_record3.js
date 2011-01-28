@@ -1,23 +1,15 @@
 var win = Titanium.UI.currentWindow;
 
+//
+//Recording Audio Global Identifiers
+//
 Titanium.Media.audioSessionMode = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
 var recording = Ti.Media.createAudioRecorder();
 var file;
 var sound;
 var audioSample = 'recording.wav';
 var file_recorded = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, audioSample);
-
 upload_audio = file_recorded.read();
-
-var payload = {
-	"media": upload_audio,
-	"name": audioSample
-};
-
-Titanium.Geolocation.purpose = "Recieve User Location";
-Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-Titanium.Geolocation.distanceFilter = 10;
-
 // default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
 // default format is Ti.Media.AUDIO_FILEFORMAT_CAF
 
@@ -28,6 +20,99 @@ Titanium.Geolocation.distanceFilter = 10;
 recording.compression = Ti.Media.AUDIO_FORMAT_ULAW;
 recording.format = Ti.Media.AUDIO_FILEFORMAT_WAVE;
 
+//
+//Geolocation Global Identifiers
+//
+var coordinates;
+var updatedLocation.text;
+var updatedLongitude.text;
+Titanium.Geolocation.purpose = "Recieve User Location";
+Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
+Titanium.Geolocation.distanceFilter = 10;
+
+//
+// Geolocation Text
+//
+
+var updatedLocationLabel = Titanium.UI.createLabel({
+	text:'Updated Location',
+	font:{fontSize:12, fontWeight:'bold'},
+	color:'#111',
+	top:280, //Base number
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLocationLabel);
+
+var updatedLocation = Titanium.UI.createLabel({
+	text:'Updated Location not fired',
+	font:{fontSize:11},
+	color:'#444',
+	top:300, // + 20 difference
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLocation);
+
+var updatedLatitude = Titanium.UI.createLabel({
+	text:'',
+	font:{fontSize:11},
+	color:'#444',
+	top:320, // + 20 difference
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLatitude);
+
+//
+// Get current position - This fires once
+//
+Titanium.Geolocation.getCurrentPosition(function(e){
+		if (!e.success || e.error)
+		{
+			currentLocation.text = 'error: ' + JSON.stringify(e.error);
+			alert('error ' + JSON.stringify(e.error));
+			return;
+		}
+		var longitude = e.coords.longitude;
+		var latitude = e.coords.latitude;
+	});
+
+Titanium.Geolocation.addEventListener('location', function(e)
+{
+	if (!e.success || e.error)
+	{
+		updatedLocation.text = 'error:' + JSON.stringify(e.error);
+		updatedLatitude.text = '';
+		updatedLocationAccuracy.text = '';
+		updatedLocationTime.text = '';
+		return;
+	}
+
+	var longitude = e.coords.longitude;
+	var latitude = e.coords.latitude;
+	updatedLocation.text = 'long:' + longitude;
+	updatedLatitude.text = 'lat: '+ latitude;
+});
+//
+//HTTPClient "Payload" Global Identifiers
+//
+var audio_payload = {
+	"media": upload_audio,
+	"name": audioSample
+};
+
+var gps_coordinates = {
+	"coords": '',
+	"name": ''
+};
+
+//
+//Button - Start Recording
+//
 var start = Titanium.UI.createButton({	
 	title:'Start Recording',
 	height:40,
@@ -65,6 +150,9 @@ start.addEventListener('click', function()
 	}
 });
 
+//
+//Button - Playback Recording
+//
 var b2 = Titanium.UI.createButton({
 	title:'Playback Recording',
 	width:180,
@@ -97,6 +185,9 @@ b2.addEventListener('click', function()
 	}
 });
 
+//
+//Button - Upload Audio
+//
 var upload = Titanium.UI.createButton({
 	title:'Upload',
 	height:40,
@@ -128,25 +219,22 @@ upload.addEventListener('click', function(e) {
 	//open the client
 	xhr.open('POST', 'http://localhost/upload_audio2.php', false); //false makes it synchronous
 	xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	xhr.send(payload);
+	xhr.send(audio_payload);
 });
+
+//
+//Button - Coords Upload
+//
 
 var upload_coords = Titanium.UI.createButton({
 	title:'Coords Upload',
 	height:40,
 	width:145,
 	right:80,
-	top:220
+	top:240
 });
 win.add(upload_coords);
 upload_coords.addEventListener('click', function(e) {
-
-	function currentLocation() {
-		Titanium.Geolocation.getCurrentPosition(function(e){
-	        var coordinates={latitude: e.coords.latitude, longitude: e.coords.longitude};
-			return coordinates;
-		});
-
 	var xhr = Titanium.Network.createHTTPClient();
 	xhr.onerror = function(e)
 	{
@@ -166,7 +254,5 @@ upload_coords.addEventListener('click', function(e) {
 	//open the client
 	xhr.open('POST', 'http://localhost/upload_audio2.php', false);
 	//xhr.setRequestHeader("Content-Type", "text");
-	xhr.send(coordinates);
-	};
-	
-});
+	xhr.send(gps_coordinates);
+	});
