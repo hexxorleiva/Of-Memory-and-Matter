@@ -43,8 +43,8 @@ win.add(mapView);
 
 //I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
-	latitude = e.latitude;
-	longitude = e.longitude;
+	var latitude = e.latitude;
+	var longitude = e.longitude;
 });
 
 //Might be redundant, but this is to change the longitude, latitude values when the user moves more tha 10 meters.
@@ -53,11 +53,15 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		Titanium.API.error('geo - postion' + e.error);
 		return;
 	}
-	var latitude = e.coords.latitude;
-	var longitude = e.coords.longitude;
-	Titanium.API.info('geo - position');
-	Titanium.API.info(' - latitude' + latitude);
-	Titanium.API.info(' - longitude' + longitude);
+	var updatedLocation = {
+		latitude: e.coords.latitude,
+		longitude: e.coords.longitude,
+		animate:true,
+		latitudeDelta:0.005,
+		longitudeDelta:0.005
+	};
+	mapView.setLocation(updatedLocation);
+	Titanium.API.info('geo - position' + updatedLocation);
 });
 
 	
@@ -76,10 +80,10 @@ Titanium.Geolocation.addEventListener('location', function(e){
 
 				var wireClickHandlers = function() {
 					zoomin.addEventListener('click',function() {
-						mapview.zoom(1);
+						mapView.zoom(1);
 					});
 					zoomout.addEventListener('click',function() {
-						mapview.zoom(-1);
+						mapView.zoom(-1);
 					});
 				};
 			  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android

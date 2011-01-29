@@ -3,6 +3,7 @@ var win = Titanium.UI.currentWindow;
 //
 //Recording Audio Global Identifiers
 //
+
 Titanium.Media.audioSessionMode = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
 var recording = Ti.Media.createAudioRecorder();
 var file;
@@ -23,9 +24,10 @@ recording.format = Ti.Media.AUDIO_FILEFORMAT_WAVE;
 //
 //Geolocation Global Identifiers
 //
-var coordinates;
-var Latitude;
-var Longitude;
+
+var coordinates = 'coordinates';
+var latitude;
+var longitude;
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 Titanium.Geolocation.distanceFilter = 10;
@@ -70,6 +72,7 @@ win.add(updatedLatitude);
 //
 // Get current position - This fires once
 //
+
 Titanium.Geolocation.getCurrentPosition(function(e){
 		if (!e.success || e.error)
 		{
@@ -81,33 +84,35 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		var latitude = e.coords.latitude;
 	});
 
-/* Titanium.Geolocation.addEventListener('location', function(e)
-{
-	if (!e.success || e.error)
-	{
-		updatedLocation.text = 'error:' + JSON.stringify(e.error);
-		updatedLatitude.text = '';
-		updatedLocationAccuracy.text = '';
-		updatedLocationTime.text = '';
-		return;
-	}
+	Titanium.Geolocation.addEventListener('location', function(e)
+		{
+			if (!e.success || e.error)
+			{
+				updatedLocation.text = 'error:' + JSON.stringify(e.error);
+				updatedLatitude.text = '';
+				updatedLocationAccuracy.text = '';
+				updatedLocationTime.text = '';
+				return;
+			}
 
-	var longitude = e.coords.longitude;
-	var latitude = e.coords.latitude;
-	updatedLocation.text = 'long:' + longitude;
-	updatedLatitude.text = 'lat: '+ latitude;
-}); */
+			var longitude = e.coords.longitude;
+			var latitude = e.coords.latitude;
+			updatedLocation.text = 'long:' + longitude;
+			updatedLatitude.text = 'lat: '+ latitude;
+		});
+
 //
 //HTTPClient "Payload" Global Identifiers
 //
+
 var audio_payload = {
 	"media": upload_audio,
 	"name": audioSample
 };
 
 var gps_coordinates = {
-	"coords": '',
-	"name": ''
+	"coords": longitude,
+	"name": coordinates
 };
 
 //
@@ -235,24 +240,7 @@ var upload_coords = Titanium.UI.createButton({
 });
 win.add(upload_coords);
 upload_coords.addEventListener('click', function(e) {
-	Titanium.Geolocation.addEventListener('location', function(e)
-	{
-		if (!e.success || e.error)
-		{
-			updatedLocation.text = 'error:' + JSON.stringify(e.error);
-			updatedLatitude.text = '';
-			updatedLocationAccuracy.text = '';
-			updatedLocationTime.text = '';
-			return;
-		}
-
-		var longitude = e.coords.longitude;
-		var latitude = e.coords.latitude;
-		updatedLocation.text = 'long:' + longitude;
-		updatedLatitude.text = 'lat: '+ latitude;
-	});
-});
-	/*var xhr = Titanium.Network.createHTTPClient();
+	var xhr = Titanium.Network.createHTTPClient();
 	xhr.onerror = function(e)
 	{
 		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
@@ -272,4 +260,4 @@ upload_coords.addEventListener('click', function(e) {
 	xhr.open('POST', 'http://localhost/upload_audio2.php', false);
 	//xhr.setRequestHeader("Content-Type", "text");
 	xhr.send(gps_coordinates);
-	});*/
+});
