@@ -41,11 +41,13 @@ Titanium.Geolocation.getCurrentPosition(function(e){
  
 win.add(mapView);
 
+//I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
 	latitude = e.latitude;
 	longitude = e.longitude;
 });
 
+//Might be redundant, but this is to change the longitude, latitude values when the user moves more tha 10 meters.
 Titanium.Geolocation.addEventListener('location', function(e){
 	if (e.error) {
 		Titanium.API.error('geo - postion' + e.error);
