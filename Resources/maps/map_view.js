@@ -21,15 +21,15 @@ Titanium.Geolocation.distanceFilter = 10;
 var mapview = Titanium.Map.createView({
     mapType: Titanium.Map.STANDARD_TYPE,
     animate:true,
-    region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1},
+    region: {latitude:latitude, longitude:longitude, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
     regionFit:true,
     userLocation:true,
     visible: true
 });
  
-//Get the current position and set it to the mapview
-function currentLocation() {
-	Titanium.Geolocation.getCurrentPosition(function(e){
+//THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK
+//function currentLocation() {
+Titanium.Geolocation.getCurrentPosition(function(e){
         var region={
             latitude: e.coords.latitude,
             longitude: e.coords.longitude,
@@ -39,12 +39,16 @@ function currentLocation() {
         };
         mapview.setLocation(region);
 	});
-};
+//};
  
 win.add(mapview);
 
-Titanium.Geolocation.addEventListener('location',function(){
-    currentLocation();
+Titanium.Geolocation.addEventListener('location',function(e){
+    //currentLocation();
+	longitude = e.coords.longitude;
+	latitude = e.coords.latitude;
+	return longitude+latitude;
+	//return latitude;
 });
 			
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
