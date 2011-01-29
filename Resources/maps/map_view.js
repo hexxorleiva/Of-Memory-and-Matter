@@ -14,21 +14,20 @@ if (Titanium.Platform.name == 'android'){
 
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-
 // Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
 Titanium.Geolocation.distanceFilter = 10;
-//set the mapview with the current location
-var mapview = Titanium.Map.createView({
+
+// Start by creating the Map with these current coordinates
+var mapView = Titanium.Map.createView({
     mapType: Titanium.Map.STANDARD_TYPE,
     animate:true,
-    region: {latitude:latitude, longitude:longitude, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
+    region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
     regionFit:true,
     userLocation:true,
     visible: true
 });
  
-//THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK
-//function currentLocation() {
+//THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK. Gets the user's current location.
 Titanium.Geolocation.getCurrentPosition(function(e){
         var region={
             latitude: e.coords.latitude,
@@ -37,20 +36,29 @@ Titanium.Geolocation.getCurrentPosition(function(e){
             latitudeDelta:0.005,
             longitudeDelta:0.005
         };
-        mapview.setLocation(region);
+        mapView.setLocation(region);
 	});
-//};
  
-win.add(mapview);
+win.add(mapView);
 
-Titanium.Geolocation.addEventListener('location',function(e){
-    //currentLocation();
-	longitude = e.coords.longitude;
-	latitude = e.coords.latitude;
-	return longitude+latitude;
-	//return latitude;
+mapView.addEventListener('regionChanged', function(e) {
+	latitude = e.latitude;
+	longitude = e.longitude;
 });
-			
+
+Titanium.Geolocation.addEventListener('location', function(e){
+	if (e.error) {
+		Titanium.API.error('geo - postion' + e.error);
+		return;
+	}
+	var latitude = e.coords.latitude;
+	var longitude = e.coords.longitude;
+	Titanium.API.info('geo - position');
+	Titanium.API.info(' - latitude' + latitude);
+	Titanium.API.info(' - longitude' + longitude);
+});
+
+	
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
 					For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
 					folder. I don't know why, but it made a clean rebuild and it started adding the bars and acknowledging the
