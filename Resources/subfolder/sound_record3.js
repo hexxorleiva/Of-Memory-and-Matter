@@ -25,7 +25,7 @@ recording.format = Ti.Media.AUDIO_FILEFORMAT_WAVE;
 //Geolocation Global Identifiers
 //
 
-var coordinates = 'coordinates';
+var coordinates = 'coordinates.txt';
 var latitude;
 var longitude;
 Titanium.Geolocation.purpose = "Recieve User Location";
@@ -82,24 +82,23 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		}
 		var longitude = e.coords.longitude;
 		var latitude = e.coords.latitude;
-	});
 
-	Titanium.Geolocation.addEventListener('location', function(e)
+});
+
+Titanium.Geolocation.addEventListener('location', function(e){
+		if (!e.success || e.error)
 		{
-			if (!e.success || e.error)
-			{
-				updatedLocation.text = 'error:' + JSON.stringify(e.error);
-				updatedLatitude.text = '';
-				updatedLocationAccuracy.text = '';
-				updatedLocationTime.text = '';
-				return;
-			}
-
-			var longitude = e.coords.longitude;
-			var latitude = e.coords.latitude;
-			updatedLocation.text = 'long:' + longitude;
-			updatedLatitude.text = 'lat: '+ latitude;
-		});
+			updatedLocation.text = 'error:' + JSON.stringify(e.error);
+			updatedLatitude.text = '';
+			updatedLocationAccuracy.text = '';
+			updatedLocationTime.text = '';
+			return;
+		}
+		var longitude = e.coords.longitude;
+		var latitude = e.coords.latitude;
+		updatedLocation.text = 'long:' + longitude;
+		updatedLatitude.text = 'lat: '+ latitude;
+});
 
 //
 //HTTPClient "Payload" Global Identifiers
@@ -116,6 +115,11 @@ var gps_coordinates = {
 };
 
 //
+//Database Storage
+//
+
+
+//
 //Button - Start Recording
 //
 var start = Titanium.UI.createButton({	
@@ -126,33 +130,33 @@ var start = Titanium.UI.createButton({
 	top:60
 });
 win.add(start);
-start.addEventListener('click', function()
-{
-	if (recording.recording)
+	start.addEventListener('click', function()
 	{
-		file = recording.stop();
-		var f = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, 'recording.wav');
-		if (f.exists()) {f.deleteFile();}
-		f.write(file.toBlob);
-		start.title = "Start Recording";
-		//clearInterval(timer);
-		Ti.Media.stopMicrophoneMonitor();
-	}
-	else
-	{
-		if (!Ti.Media.canRecord) {
-			Ti.UI.createAlertDialog({
-				title:'Error!',
-				message:'No audio recording hardware is currently connected.'
-			}).show();
-			return;
+		if (recording.recording)
+		{
+			file = recording.stop();
+			var f = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, 'recording.wav');
+			if (f.exists()) {f.deleteFile();}
+			f.write(file.toBlob);
+			start.title = "Start Recording";
+			//clearInterval(timer);
+			Ti.Media.stopMicrophoneMonitor();
 		}
-		start.title = "Stop Recording";
-		recording.start();
-		Ti.Media.startMicrophoneMonitor();
-		duration = 0;
-		//timer = setInterval(showLevels,1000);
-	}
+		else
+		{
+			if (!Ti.Media.canRecord) {
+				Ti.UI.createAlertDialog({
+					title:'Error!',
+					message:'No audio recording hardware is currently connected.'
+					}).show();
+					return;
+				}
+				start.title = "Stop Recording";
+				recording.start();
+				Ti.Media.startMicrophoneMonitor();
+				duration = 0;
+				//timer = setInterval(showLevels,1000);
+			}
 });
 
 //
@@ -168,26 +172,26 @@ var b2 = Titanium.UI.createButton({
 //
 
 win.add(b2);
-b2.addEventListener('click', function()
-{
-	if (sound && sound.playing)
+	b2.addEventListener('click', function()
 	{
-		sound.stop();
-		sound.release();
-		sound = null;
-		b2.title = 'Playback Recording';
-	}
-	else
-	{
-		Ti.API.info("recording file size: "+file.size);
-		sound = Titanium.Media.createSound({sound:file});
-		sound.addEventListener('complete', function()
+		if (sound && sound.playing)
 		{
+			sound.stop();
+			sound.release();
+			sound = null;
 			b2.title = 'Playback Recording';
-		});
-		sound.play();
-		b2.title = 'Stop Playback';
-	}
+		}
+		else
+		{
+			Ti.API.info("recording file size: "+file.size);
+			sound = Titanium.Media.createSound({sound:file});
+			sound.addEventListener('complete', function()
+			{
+				b2.title = 'Playback Recording';
+			});
+			sound.play();
+			b2.title = 'Stop Playback';
+		}
 });
 
 //
@@ -201,31 +205,31 @@ var upload = Titanium.UI.createButton({
 	top:180
 });
 win.add(upload);
-upload.addEventListener('click', function(e) {
-	upload.title = "Recorded: " + file.size;
+	upload.addEventListener('click', function(e) {
+		upload.title = "Recorded: " + file.size;
 	
-	var xhr = Titanium.Network.createHTTPClient();
+		var xhr = Titanium.Network.createHTTPClient();
 	
-	xhr.onerror = function(e)
-	{
-		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-		Titanium.API.info('IN ERROR' + e.error);
-	};
-	xhr.setTimeout(20000);
-	xhr.onload = function(e)
-	{
-		Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
-		Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
-	};
-	xhr.onsendstream = function(e)
-	{
-		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
-	};
-	//open the client
-	xhr.open('POST', 'http://localhost/upload_audio2.php', false); //false makes it synchronous
-	xhr.setRequestHeader("Content-Type", "audio/x-wav");
-	xhr.send(audio_payload);
-});
+		xhr.onerror = function(e)
+		{
+			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+			Titanium.API.info('IN ERROR' + e.error);
+		};
+		xhr.setTimeout(20000);
+		xhr.onload = function(e)
+		{
+			Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
+			Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
+		};
+		xhr.onsendstream = function(e)
+		{
+			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+		};
+		//open the client
+		xhr.open('POST', 'http://localhost/upload_audio2.php', false); //false makes it synchronous
+		xhr.setRequestHeader("Content-Type", "audio/x-wav");
+		xhr.send(audio_payload);
+	});
 
 //
 //Button - Coords Upload
@@ -239,25 +243,25 @@ var upload_coords = Titanium.UI.createButton({
 	top:240
 });
 win.add(upload_coords);
-upload_coords.addEventListener('click', function(e) {
-	var xhr = Titanium.Network.createHTTPClient();
-	xhr.onerror = function(e)
-	{
-		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-		Titanium.API.info('IN ERROR' + e.error);
-	};
-	xhr.setTimeout(20000);
-	xhr.onload = function(e)
-	{
-		Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
-		Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
-	};
-	xhr.onsendstream = function(e)
-	{
-		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
-	};
-	//open the client
-	xhr.open('POST', 'http://localhost/upload_audio2.php', false);
-	//xhr.setRequestHeader("Content-Type", "text");
-	xhr.send(gps_coordinates);
-});
+	upload_coords.addEventListener('click', function(e) {
+		var xhr = Titanium.Network.createHTTPClient();
+		xhr.onerror = function(e)
+		{
+			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+			Titanium.API.info('IN ERROR' + e.error);
+		};
+		xhr.setTimeout(20000);
+		xhr.onload = function(e)
+		{
+			Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
+			Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
+		};
+		xhr.onsendstream = function(e)
+		{
+			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+		};
+		//open the client
+		xhr.open('POST', 'http://localhost/upload_audio2.php', false);
+		//xhr.setRequestHeader("Content-Type", "text");
+		xhr.send(gps_coordinates);
+	});
