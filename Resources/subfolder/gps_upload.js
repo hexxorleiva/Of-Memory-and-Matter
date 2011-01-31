@@ -13,9 +13,8 @@ var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDire
 newDir.createDirectory();
 Titanium.API.info('Path to newdir: ' + newDir.nativePath);
 
-var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, 'coordinates.txt');
+var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, 'coordinates');
 var uploadGPS = gps_recorded.read();
-
 
 //
 // Geolocation Text
@@ -68,10 +67,14 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		}
 		var longitude = e.coords.longitude;
 		var latitude = e.coords.latitude;
+		
+		//Titanium.App.Properties.setDouble('longitde',longitude);
+		//Titanium.App.Properties.setDouble('latitude',latitude);
+		
 		//Establishes a JSON array
 		var datatoWrite = {"latitude":latitude, "longitude":longitude};
 		//Data to write?
-		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates.txt');
+		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
 		newFile.write(JSON.stringify(datatoWrite));
 });
 Titanium.Geolocation.addEventListener('location', function(e){
@@ -87,13 +90,20 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		latitude = e.coords.latitude;
 		updatedLocation.text = 'long:' + longitude;
 		updatedLatitude.text = 'lat: '+ latitude;
-		//Establishes a JSON array
+		
+		//Titanium.App.Properties.setDouble('longitde',longitude);
+		//Titanium.App.Properties.setDouble('latitude',latitude);
+		
 		var datatoWrite = {"latitude":latitude, "longitude":longitude};
-		//Data to write?
-		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates.txt');
+		
+		//Data to write? This is apparent overkill
+		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
 		newFile.write(JSON.stringify(datatoWrite));
 });
 
+
+//var datatoWrite = {"latitude":latitude, "longitude":longitude};
+//datatoWrite.write(JSON.stringify(datatoWrite));
 
 var gps_coordinates = {
 	"coords": uploadGPS,
@@ -131,6 +141,6 @@ win.add(upload_coords);
 		};
 		//open the client
 		xhr.open('POST', 'http://localhost/gps_audio.php', false);
-		xhr.setRequestHeader("Content-Type", "text");
+		xhr.setRequestHeader("Content-Type", "JSON");
 		xhr.send(gps_coordinates);
 	});
