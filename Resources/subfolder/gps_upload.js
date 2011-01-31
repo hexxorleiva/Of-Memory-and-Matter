@@ -72,7 +72,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		//Titanium.App.Properties.setDouble('latitude',latitude);
 		
 		//Establishes a JSON array
-		var datatoWrite = {"latitude":latitude, "longitude":longitude};
+		var datatoWrite = {"usersgps" : [{"latitude":latitude, "longitude":longitude}]};
 		//Data to write?
 		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
 		newFile.write(JSON.stringify(datatoWrite));
@@ -94,7 +94,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		//Titanium.App.Properties.setDouble('longitde',longitude);
 		//Titanium.App.Properties.setDouble('latitude',latitude);
 		
-		var datatoWrite = {"latitude":latitude, "longitude":longitude};
+		var datatoWrite = {"usersgps" : [{"latitude":latitude, "longitude":longitude}]};
 		
 		//Data to write? This is apparent overkill
 		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
@@ -141,6 +141,6 @@ win.add(upload_coords);
 		};
 		//open the client
 		xhr.open('POST', 'http://localhost/gps_audio.php', false);
-		xhr.setRequestHeader("Content-Type", "JSON");
+		xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 		xhr.send(gps_coordinates);
 	});
