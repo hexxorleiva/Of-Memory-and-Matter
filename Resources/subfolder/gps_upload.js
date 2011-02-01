@@ -15,7 +15,7 @@ Titanium.API.info('Path to newdir: ' + newDir.nativePath);
 
 var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, 'coordinates');
 var uploadGPS = gps_recorded.read();
-
+Titanium.API.info(uploadGPS);
 //
 // Geolocation Text
 //
@@ -72,7 +72,13 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		//Titanium.App.Properties.setDouble('latitude',latitude);
 		
 		//Establishes a JSON array
-		var datatoWrite = {"usersgps" : [{"latitude":latitude}, {"longitude":longitude}]};
+		var datatoWrite = {"usersgps" : 
+									{
+									"latitude":latitude, 
+									"longitude":longitude
+									}
+										};
+		
 		//Data to write?
 		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
 		newFile.write(JSON.stringify(datatoWrite));
@@ -94,7 +100,12 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		//Titanium.App.Properties.setDouble('longitde',longitude);
 		//Titanium.App.Properties.setDouble('latitude',latitude);
 		
-		var datatoWrite = {"usersgps" : [{"latitude":latitude}, {"longitude":longitude}]};
+		var datatoWrite = {"usersgps" : 
+									{
+									"latitude":latitude, 
+									"longitude":longitude
+									}
+										};
 		
 		//Data to write? This is apparent overkill
 		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
