@@ -18,8 +18,9 @@ Titanium.Media.audioSessionMode = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
 var recording = Ti.Media.createAudioRecorder();
 var file;
 var sound;
-var audioSample = 'recording.wav';
-var file_recorded = Titanium.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory, audioSample);
+var audioName = 'recording';
+var newAudiofile = 'recording.wav';
+var file_recorded = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, newAudiofile); //audioSample
 upload_audio = file_recorded.read();
 // default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
 // default format is Ti.Media.AUDIO_FILEFORMAT_CAF
@@ -63,7 +64,7 @@ Titanium.API.info(uploadGPS);
 //
 var audio_payload = {
 	"media": upload_audio,
-	"name": audioSample
+	"name": audioName
 };
 
 var gps_coordinates = {
@@ -142,9 +143,19 @@ win.add(start);
 		if (recording.recording)
 		{
 			file = recording.stop();
-			var f = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.wav');
-			if (f.exists()) {f.deleteFile();}
-			f.write(file.toBlob);
+			//Adding line to create a file instead of just replacing the recording.wav file
+			//newAudiofile.write(file.toBlob);
+			newAudiofile = Titanium.Filesystem.getFile(newDir.nativePath);
+			if (newAudiofile.exists()) {
+				newAudiofile.deleteFile();
+				} else {
+					newAudiofile.write(file.toBlob);
+				}
+
+			
+			//var f = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.wav');
+			//if (f.exists()) {f.deleteFile();}
+			//f.write(file.toBlob);
 			start.title = "Start Recording";
 			//clearInterval(timer);
 			Ti.Media.stopMicrophoneMonitor();
@@ -182,13 +193,13 @@ var b2 = Titanium.UI.createButton({
 win.add(b2);
 	b2.addEventListener('click', function()
 	{
-		if (typeof f === 'undefined') 
+		if (file === null) 
 		{
 			Titanium.UI.createAlertDialog({
 				title:'Error',
-				message:'You have not recorded anything yet!'
+				message:'You need to record something first!'
 			}).show();
-			return;
+			//return;
 		} else {
 		if (sound && sound.playing)
 		{
@@ -228,13 +239,13 @@ var upload = Titanium.UI.createButton({
 win.add(upload);
 	upload.addEventListener('click', function(e) 
 	{
-		if (typeof f === 'undefined')
+		if (!newAudiofile)
 		{
 			Titanium.UI.createAlertDialog({
 				title:'Error',
-				message:'You have not recorded anything yet!'
+				message:'You need to record something first!'
 			}).show();
-			return;
+			//return;
 		} else {
 		upload.title = "Recorded: " + file.size;
 		var xhr = Titanium.Network.createHTTPClient();
@@ -258,7 +269,12 @@ win.add(upload);
 		xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
 		xhr.setRequestHeader("Content-Type", "audio/x-wav");
 		xhr.send(audio_payload);
+		xhr.setTimeout(20000);
+		xhr.open('POST', 'http://localhost/gps_audio.php', false);
+		xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+		xhr.send(gps_coordinates);
 		}
+		
 	});
 	
 //
