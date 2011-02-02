@@ -64,22 +64,19 @@ Titanium.API.info(uploadGPS);
 
 var audio_payload = {
 	"media": upload_audio, //These need to be in double quotes to be accepted in the PHP script
-	"name": audioName
+	"name": audioName //These need to be in double quotes to be accepted in the PHP script
 };
 
 var gps_coordinates = {
-	"coords": uploadGPS,
-	"name": coordinates
+	"coords": uploadGPS, //These need to be in double quotes to be accepted in the PHP script
+	"name": coordinates //These need to be in double quotes to be accepted in the PHP script
 };
 
 var postData = {
-				"media": upload_audio,
-				"name": audioName,
-				"coords": uploadGPS
+				"media": upload_audio, //These need to be in double quotes to be accepted in the PHP script
+				"name": audioName, //These need to be in double quotes to be accepted in the PHP script
+				"coords": uploadGPS //These need to be in double quotes to be accepted in the PHP script
 				};
-var sendtoServer = JSON.stringify(postData);
-//var audio_payloadjson = JSON.stringify(audio_payload);
-//var gps_coordinatesjson = JSON.stringify(gps_coordinates);
 
 ////////////////////////////////////////////////////////////////////
 
