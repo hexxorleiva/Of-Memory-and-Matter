@@ -10,6 +10,11 @@ GPS:
 */
 var win = Titanium.UI.currentWindow;
 
+//Creation of a new Directory to store both GPS and audio files
+var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
+newDir.createDirectory();
+Titanium.API.info('Path to newdir: ' + newDir.nativePath);
+
 //
 //Recording Audio Global Identifiers
 //
@@ -20,7 +25,7 @@ var file;
 var sound;
 var audioName = 'recording';
 var newAudiofile = 'recording.wav';
-var file_recorded = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, newAudiofile); //audioSample
+var file_recorded = Titanium.Filesystem.getFile(newDir.nativePath, newAudiofile); //audioSample
 upload_audio = file_recorded.read();
 // default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
 // default format is Ti.Media.AUDIO_FILEFORMAT_CAF
@@ -46,14 +51,8 @@ Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 Titanium.Geolocation.distanceFilter = 10;
 
-
-//Creation of a new Directory to store both GPS and audio files
-var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
-newDir.createDirectory();
-Titanium.API.info('Path to newdir: ' + newDir.nativePath);
-
 //Getting the files - GPS
-var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, 'coordinates');
+var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, "coordinates.JSON");
 //Loading file into a variable
 var uploadGPS = gps_recorded.read();
 //Outputting Variable into Titanium GUI for debugging
@@ -64,7 +63,7 @@ Titanium.API.info(uploadGPS);
 //
 
 var audio_payload = {
-	"media": upload_audio,
+	"media": upload_audio, //These need to be in double quotes to be accepted in the PHP script
 	"name": audioName
 };
 
@@ -78,6 +77,7 @@ var postData = {
 				"name": audioName,
 				"coords": uploadGPS
 				};
+var sendtoServer = JSON.stringify(postData);
 //var audio_payloadjson = JSON.stringify(audio_payload);
 //var gps_coordinatesjson = JSON.stringify(gps_coordinates);
 
@@ -101,7 +101,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 										};
 		
 		//Data to write?
-		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
+		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,"coordinates.JSON");
 		newFile.write(JSON.stringify(datatoWrite));
 
 });
@@ -126,7 +126,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 										};
 		
 		//Data to write?
-		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,'coordinates');
+		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,"coordinates.JSON");
 		newFile.write(JSON.stringify(datatoWrite));
 });
 
@@ -260,7 +260,7 @@ win.add(upload);
 		xhr.setTimeout(20000);
 		xhr.onload = function(e)
 		{
-			Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
+			Titanium.UI.createAlertDialog({title:'Success', message:'Your audio has been uploaded to the server'}).show(); //message:'status code' + this.status
 			Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
 		};
 		xhr.onsendstream = function(e)
@@ -273,7 +273,7 @@ win.add(upload);
 		//xhr.send(audio_payload);
 		//xhr.setTimeout(20000);
 		xhr.open('POST', 'http://localhost/uploadingpage.php', false); //http://localhost/gps_audio.php
-		xhr.setRequestHeader("Content-Type", "text/json");
+		xhr.setRequestHeader("Content-Type", "audio/json");
 		xhr.send(postData);
 		};
 	});
@@ -346,7 +346,7 @@ win.add(upload_coords);
 			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 		};
 		//open the client
-		xhr.open('POST', 'http://localhost/gps_audio.php', false);
+		xhr.open('POST', 'http://localhost/uploadingpage.php', false);
 		xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-		xhr.send(gps_coordinates);
+		xhr.send(sendtoServer);
 	});
