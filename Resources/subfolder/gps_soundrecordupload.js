@@ -62,6 +62,7 @@ Titanium.API.info(uploadGPS);
 //
 //HTTPClient "Payload" Global Identifiers
 //
+
 var audio_payload = {
 	"media": upload_audio,
 	"name": audioName
@@ -71,6 +72,14 @@ var gps_coordinates = {
 	"coords": uploadGPS,
 	"name": coordinates
 };
+
+var postData = {
+				"media": upload_audio,
+				"name": audioName,
+				"coords": uploadGPS
+				};
+//var audio_payloadjson = JSON.stringify(audio_payload);
+//var gps_coordinatesjson = JSON.stringify(gps_coordinates);
 
 ////////////////////////////////////////////////////////////////////
 
@@ -138,28 +147,22 @@ var start = Titanium.UI.createButton({
 //
 
 win.add(start);
-	start.addEventListener('click', function()
-	{
+	start.addEventListener('click', function(){
 		if (recording.recording)
 		{
 			file = recording.stop();
 			//Adding line to create a file instead of just replacing the recording.wav file
+			newAudiofile = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.wav');
 			//newAudiofile.write(file.toBlob);
-			newAudiofile = Titanium.Filesystem.getFile(newDir.nativePath);
 			if (newAudiofile.exists()) {
 				newAudiofile.deleteFile();
+				newAudiofile.write(file.toBlob);
 				} else {
 					newAudiofile.write(file.toBlob);
 				}
-
-			
-			//var f = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.wav');
-			//if (f.exists()) {f.deleteFile();}
-			//f.write(file.toBlob);
 			start.title = "Start Recording";
-			//clearInterval(timer);
 			Ti.Media.stopMicrophoneMonitor();
-		}
+			}
 		else
 		{
 			if (!Ti.Media.canRecord) {
@@ -173,7 +176,6 @@ win.add(start);
 				recording.start();
 				Ti.Media.startMicrophoneMonitor();
 				duration = 0;
-				//timer = setInterval(showLevels,1000);
 			}
 });
 
@@ -193,7 +195,7 @@ var b2 = Titanium.UI.createButton({
 win.add(b2);
 	b2.addEventListener('click', function()
 	{
-		if (file === null) 
+		if (file == null) 
 		{
 			Titanium.UI.createAlertDialog({
 				title:'Error',
@@ -239,7 +241,7 @@ var upload = Titanium.UI.createButton({
 win.add(upload);
 	upload.addEventListener('click', function(e) 
 	{
-		if (!newAudiofile)
+		if (file == null)
 		{
 			Titanium.UI.createAlertDialog({
 				title:'Error',
@@ -266,15 +268,14 @@ win.add(upload);
 			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 		};
 		//open the client
-		xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
-		xhr.setRequestHeader("Content-Type", "audio/x-wav");
-		xhr.send(audio_payload);
-		xhr.setTimeout(20000);
-		xhr.open('POST', 'http://localhost/gps_audio.php', false);
-		xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-		xhr.send(gps_coordinates);
-		}
-		
+		//xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
+		//xhr.setRequestHeader("Content-Type", "audio/x-wav");
+		//xhr.send(audio_payload);
+		//xhr.setTimeout(20000);
+		xhr.open('POST', 'http://localhost/uploadingpage.php', false); //http://localhost/gps_audio.php
+		xhr.setRequestHeader("Content-Type", "text/json");
+		xhr.send(postData);
+		};
 	});
 	
 //
