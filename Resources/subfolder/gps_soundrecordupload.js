@@ -93,8 +93,8 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		
 		//Establishes a JSON array for GPS
 		var datatoWrite = {
-							"latitude":latitude, 
-							"longitude":longitude
+							"longitude":longitude,
+							"latitude":latitude
 										};
 		
 		//Data to write?
@@ -118,8 +118,8 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		updatedLatitude.text = 'lat: '+ latitude;
 		
 		var datatoWrite = {
-							"latitude":latitude, 
-							"longitude":longitude
+							"longitude":longitude,
+							"latitude":latitude
 										};
 		
 		//Data to write?
@@ -274,18 +274,6 @@ win.add(upload);
 		xhr.send(postData);
 		};
 	});
-	
-//
-//Button - Coords Upload
-//
-
-var upload_coords = Titanium.UI.createButton({
-	title:'Coords Upload',
-	height:40,
-	width:145,
-	right:80,
-	top:240
-});
 
 //
 
@@ -321,29 +309,3 @@ var updatedLatitude = Titanium.UI.createLabel({
 	width:300 //same
 });
 win.add(updatedLatitude);
-
-////////////////////////////////////////////////////////////////////
-
-win.add(upload_coords);
-	upload_coords.addEventListener('click', function(e) {
-		var xhr = Titanium.Network.createHTTPClient();
-		xhr.onerror = function(e)
-		{
-			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-			Titanium.API.info('IN ERROR' + e.error);
-		};
-		xhr.setTimeout(20000);
-		xhr.onload = function(e)
-		{
-			Titanium.UI.createAlertDialog({title:'Success', message:'status code ' + this.status}).show();
-			Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
-		};
-		xhr.onsendstream = function(e)
-		{
-			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
-		};
-		//open the client
-		xhr.open('POST', 'http://localhost/uploadingpage.php', false);
-		xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-		xhr.send(sendtoServer);
-	});

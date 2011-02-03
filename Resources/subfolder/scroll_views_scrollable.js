@@ -1,4 +1,4 @@
-function getOrientation(o)
+/*function getOrientation(o)
 {  //Came from orientation.js, but we didn't need the buttons and such
 	switch (o)
 	{
@@ -32,7 +32,7 @@ function getOrientation(o)
 		}
 	}
 }
-
+*/
 
 var win = Titanium.UI.currentWindow;
 win.backgroundColor = '#000';
