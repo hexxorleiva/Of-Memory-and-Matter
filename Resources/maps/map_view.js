@@ -8,6 +8,15 @@ var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
 	isAndroid = true;
 }
+/*
+The following script showcases the Map Google API and current position of the user.
+There is also a listener event that will change the way the map behaviors in accordance to
+the GPS location of the user by shifting the view to their location on "eventListener('location')"
+
+Will be adding a PHP script that will update the annotations on the map of the most up to date locations
+of other recordings. 
+*/
+
 //
 // Begin Geo Location
 //
