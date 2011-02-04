@@ -3,6 +3,9 @@
 var win = Titanium.UI.currentWindow;
 var latitude;
 var longitude;
+var incomingData;
+var recording;
+var plotPoints;
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
@@ -52,7 +55,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 			var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
 			Titanium.API.info(geturl);
 		// Begin the "Get data" request
-
+/*
 				var xhr = Titanium.Network.createHTTPClient();
 				xhr.setTimeout(20000);
 				xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
@@ -64,7 +67,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 				xhr.onload = function(){
 					Titanium.API.info(this.responseText);
 				};
-				xhr.send();
+				xhr.send();*/
 	});
  
 win.add(mapView);
@@ -76,21 +79,7 @@ mapView.addEventListener('regionChanged', function(e) {
 });
 
 //Might be redundant, but this is to change the longitude, latitude values when the user moves more tha 10 meters.
-Titanium.Geolocation.addEventListener('location', function(e){
-	if (e.error) {
-		Titanium.API.error('geo - postion' + e.error);
-		return;
-	}
-	var updatedLocation = {
-		latitude: e.coords.latitude,
-		longitude: e.coords.longitude,
-		animate:true,
-		latitudeDelta:0.005,
-		longitudeDelta:0.005
-	};
-	mapView.setLocation(updatedLocation);
-	Titanium.API.info('geo - position' + updatedLocation);
-	
+Titanium.Geolocation.addEventListener('location', function(e){	
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
 	var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
@@ -105,10 +94,32 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 			Titanium.API.info('IN ERROR' + e.error);
 		};
-		xhr.onload = function(e){
+		xhr.onload = function(){
 			Titanium.API.info(this.responseText);
+			incomingData = JSON.parse(this.responseText);
+			for (var i = 0; i < incomingData.length; i++){
+				recording = incomingData[i];
+				var plotPoints = Titanium.Map.createAnnotation({
+						latitude: recording.Latitude,
+						longitude: recording.Longitude,
+						pincolor:Titanium.Map.ANNOTATION_GREEN
+					});
+				//Titanium.API.info('Does ' + latitude + ' equal ' + recording.Latitude + ' or ' + longitude + ' equal ' + recording.Longitude);
+			};
 		};
 		xhr.send();
+
+		var updatedLocation = {
+			latitude: e.coords.latitude,
+			longitude: e.coords.longitude,
+			animate:true,
+			latitudeDelta:0.005,
+			longitudeDelta:0.005,
+			annotations:[plotPoints]
+		};
+
+		mapView.setLocation(updatedLocation);
+		
 	
 });
 
