@@ -46,14 +46,33 @@ Titanium.Geolocation.getCurrentPosition(function(e){
             longitudeDelta:0.005
         };
         mapView.setLocation(region);
+
+			var latitude = e.coords.latitude;
+			var longitude = e.coords.longitude;
+			var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
+			Titanium.API.info(geturl);
+		// Begin the "Get data" request
+
+				var xhr = Titanium.Network.createHTTPClient();
+				xhr.setTimeout(20000);
+				xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
+				xhr.onerror = function(e)
+				{
+					Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+					Titanium.API.info('IN ERROR' + e.error);
+				};
+				xhr.onload = function(){
+					Titanium.API.info(this.responseText);
+				};
+				xhr.send();
 	});
  
 win.add(mapView);
 
 //I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
-	var latitude = e.latitude;
-	var longitude = e.longitude;
+	latitude = e.latitude;
+ 	longitude = e.longitude;
 });
 
 //Might be redundant, but this is to change the longitude, latitude values when the user moves more tha 10 meters.
@@ -71,6 +90,26 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	};
 	mapView.setLocation(updatedLocation);
 	Titanium.API.info('geo - position' + updatedLocation);
+	
+	latitude = e.coords.latitude;
+	longitude = e.coords.longitude;
+	var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
+	Titanium.API.info(geturl);
+// Begin the "Get data" request
+	
+		var xhr = Titanium.Network.createHTTPClient();
+		xhr.setTimeout(20000);
+		xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
+		xhr.onerror = function(e)
+		{
+			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+			Titanium.API.info('IN ERROR' + e.error);
+		};
+		xhr.onload = function(e){
+			Titanium.API.info(this.responseText);
+		};
+		xhr.send();
+	
 });
 
 	
