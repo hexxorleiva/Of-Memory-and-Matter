@@ -37,7 +37,7 @@ var mapView = Titanium.Map.createView({
     region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
     regionFit:true,
     userLocation:true,
-    visible: true,
+    visible: true
 });
  
 //THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK. Gets the user's current location.
@@ -56,17 +56,16 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 			var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
 			Titanium.API.info(geturl);
 			// Begin the "Get data" request
-
 			var xhr = Titanium.Network.createHTTPClient();
 			xhr.setTimeout(20000);
-			xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
+			xhr.open('GET', geturl, false);
 			xhr.onerror = function(e)
 				{
 				Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 				Titanium.API.info('IN ERROR' + e.error);
 				};
 			xhr.onload = function(){
-			//Titanium.API.info(this.responseText);
+			Titanium.API.info(this.responseText);
 			incomingData = JSON.parse(this.responseText);
 			for (var i = 0; i < incomingData.length; i++){
 			recorded = incomingData[i];
@@ -75,14 +74,14 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 				plotPoints = Titanium.Map.createAnnotation({
 				latitude: recorded.Latitude,
 				longitude: recorded.Longitude,
-				title: 'Here',
-				pincolor: Titanium.Map.ANNOTATION_GREEN
+				title: 'Memory',
+				pincolor: Titanium.Map.ANNOTATION_GREEN,
+				animate:true
 				});
 			mapView.addAnnotation(plotPoints);
-			//Titanium.API.info('Does ' + latitude + ' equal ' + recorded.Latitude + ' or ' + longitude + ' equal ' + recorded.Longitude);
 			};
-			};
-			xhr.send();
+		};
+		xhr.send();
 	});
  
 win.add(mapView);

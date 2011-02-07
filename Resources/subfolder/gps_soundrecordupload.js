@@ -62,19 +62,9 @@ Titanium.API.info(uploadGPS);
 //HTTPClient "Payload" Global Identifiers
 //
 
-var audio_payload = {
-	"media": upload_audio, //These need to be in double quotes to be accepted in the PHP script
-	"name": audioName //These need to be in double quotes to be accepted in the PHP script
-};
-
-var gps_coordinates = {
-	"coords": uploadGPS, //These need to be in double quotes to be accepted in the PHP script
-	"name": coordinates //These need to be in double quotes to be accepted in the PHP script
-};
-
 var postData = {
 				"media": upload_audio, //These need to be in double quotes to be accepted in the PHP script
-				"name": audioName, //These need to be in double quotes to be accepted in the PHP script
+				//"name": audioName, //These need to be in double quotes to be accepted in the PHP script
 				"coords": uploadGPS //These need to be in double quotes to be accepted in the PHP script
 				};
 
@@ -118,8 +108,8 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		updatedLatitude.text = 'lat: '+ latitude;
 		
 		var datatoWrite = {
-							"longitude":longitude,
-							"latitude":latitude
+							"latitude":latitude,
+							"longitude":longitude
 										};
 		
 		//Data to write?
@@ -269,10 +259,12 @@ win.add(upload);
 		//xhr.setRequestHeader("Content-Type", "audio/x-wav");
 		//xhr.send(audio_payload);
 		//xhr.setTimeout(20000);
-		xhr.open('POST', 'http://localhost/uploadingpage.php', false); //http://localhost/gps_audio.php
+		xhr.open('POST', 'http://localhost/uploadingaudiocoordinates.php', false); //http://localhost/gps_audio.php
 		xhr.setRequestHeader("Content-Type", "audio/json");
 		xhr.send(postData);
 		};
+		newAudiofile.deleteFile();
+		
 	});
 
 //
