@@ -4,8 +4,9 @@ var win = Titanium.UI.currentWindow;
 var latitude;
 var longitude;
 var incomingData;
-var recording;
+var recorded = [];
 var plotPoints;
+var updateAnnotations;
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
@@ -36,7 +37,7 @@ var mapView = Titanium.Map.createView({
     region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
     regionFit:true,
     userLocation:true,
-    visible: true
+    visible: true,
 });
  
 //THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK. Gets the user's current location.
@@ -54,20 +55,34 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 			var longitude = e.coords.longitude;
 			var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
 			Titanium.API.info(geturl);
-		// Begin the "Get data" request
-/*
-				var xhr = Titanium.Network.createHTTPClient();
-				xhr.setTimeout(20000);
-				xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
-				xhr.onerror = function(e)
+			// Begin the "Get data" request
+
+			var xhr = Titanium.Network.createHTTPClient();
+			xhr.setTimeout(20000);
+			xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
+			xhr.onerror = function(e)
 				{
-					Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-					Titanium.API.info('IN ERROR' + e.error);
+				Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+				Titanium.API.info('IN ERROR' + e.error);
 				};
-				xhr.onload = function(){
-					Titanium.API.info(this.responseText);
-				};
-				xhr.send();*/
+			xhr.onload = function(){
+			//Titanium.API.info(this.responseText);
+			incomingData = JSON.parse(this.responseText);
+			for (var i = 0; i < incomingData.length; i++){
+			recorded = incomingData[i];
+			Titanium.API.info(recorded.Latitude);
+			Titanium.API.info(recorded.Longitude);
+				plotPoints = Titanium.Map.createAnnotation({
+				latitude: recorded.Latitude,
+				longitude: recorded.Longitude,
+				title: 'Here',
+				pincolor: Titanium.Map.ANNOTATION_GREEN
+				});
+			mapView.addAnnotation(plotPoints);
+			//Titanium.API.info('Does ' + latitude + ' equal ' + recorded.Latitude + ' or ' + longitude + ' equal ' + recorded.Longitude);
+			};
+			};
+			xhr.send();
 	});
  
 win.add(mapView);
@@ -82,45 +97,14 @@ mapView.addEventListener('regionChanged', function(e) {
 Titanium.Geolocation.addEventListener('location', function(e){	
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
-	var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
-	Titanium.API.info(geturl);
-// Begin the "Get data" request
-	
-		var xhr = Titanium.Network.createHTTPClient();
-		xhr.setTimeout(20000);
-		xhr.open('GET', geturl, false); //http://localhost/gps_audio.php
-		xhr.onerror = function(e)
-		{
-			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-			Titanium.API.info('IN ERROR' + e.error);
-		};
-		xhr.onload = function(){
-			Titanium.API.info(this.responseText);
-			incomingData = JSON.parse(this.responseText);
-			for (var i = 0; i < incomingData.length; i++){
-				recording = incomingData[i];
-				var plotPoints = Titanium.Map.createAnnotation({
-						latitude: recording.Latitude,
-						longitude: recording.Longitude,
-						pincolor:Titanium.Map.ANNOTATION_GREEN
-					});
-				//Titanium.API.info('Does ' + latitude + ' equal ' + recording.Latitude + ' or ' + longitude + ' equal ' + recording.Longitude);
-			};
-		};
-		xhr.send();
-
-		var updatedLocation = {
+	var updatedLocation = {
 			latitude: e.coords.latitude,
 			longitude: e.coords.longitude,
 			animate:true,
 			latitudeDelta:0.005,
-			longitudeDelta:0.005,
-			annotations:[plotPoints]
+			longitudeDelta:0.005
 		};
-
 		mapView.setLocation(updatedLocation);
-		
-	
 });
 
 	
@@ -132,7 +116,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				//I believe that these declare the variables without having them set to anything.
 				var zoomin = null;
 				var zoomout = null;
-
+				
 				/*I have no idea what the "wireClickHandlers" function is suppose to do; I copied this code from the Maps example
 				  from the Titanium Appcelerator KitchenSink. I think these just make the "zoom" variables become functions that
 				  affect the mapview - and that the "mapview.zoom" part actually details how it changes the map itself.*/
@@ -144,6 +128,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 					zoomout.addEventListener('click',function() {
 						mapView.zoom(-1);
 					});
+					
 				};
 			  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android
 				 phone as is and needs to be adjusted. So (!isAndroid) = if it isn't the Android OS do the following. It was important to place anyways
