@@ -255,15 +255,11 @@ win.add(upload);
 			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 		};
 		//open the client
-		//xhr.open('POST', 'http://localhost/upload_audio.php', false); //false makes it synchronous
-		//xhr.setRequestHeader("Content-Type", "audio/x-wav");
-		//xhr.send(audio_payload);
-		//xhr.setTimeout(20000);
 		xhr.open('POST', 'http://localhost/uploadingaudiocoordinates.php', false); //http://localhost/gps_audio.php
 		xhr.setRequestHeader("Content-Type", "audio/json");
 		xhr.send(postData);
+		file = null;
 		};
-		newAudiofile.deleteFile();
 		
 	});
 
