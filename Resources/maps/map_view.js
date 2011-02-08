@@ -96,7 +96,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
 	
-	var currentCoordinates = { "coords": [
+	var currentCoordinates = { "currentcoords": [
 				   {"latitude": latitude,
 				   "longitude": longitude}]
 						};
@@ -134,8 +134,9 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		pincolor: Titanium.Map.ANNOTATION_GREEN,
 		animate:true
 				});
-	mapView.addAnnotation(plotPoints);
-/*	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
+	mapView.addAnnotation(plotPoints);	
+	//Here is where it will try and calculate the distance and within a certain radius it will send a POST to the server to retrieve the audio url from the database.
+	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
 	if (distanceCalculated <= .000249) {
 		xhr.setTimeout(20000);
 		xhr.open('POST', "http://localhost/comparecoordaintes.php", false);
@@ -146,8 +147,11 @@ Titanium.Geolocation.addEventListener('location', function(e){
 					};
 		xhr.onload = function(e)
 			{
+			//Receieve the audio url and read it through Titanium
 			Titanium.API.info(this.responseText);
+			//Have variable "streamingAudioURL" equal the incoming echo from php script.
 			streamingAudioURL = JSON.parse(this.responseText);
+			//Begins the player.
 			var streamer = Titanium.Media.createAudioPlayer();
 			
 			//have audio player play back url received from server
