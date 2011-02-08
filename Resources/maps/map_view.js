@@ -88,17 +88,19 @@ win.add(mapView);
 
 //I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
-	latitude = e.coords.latitude;
- 	longitude = e.coords.longitude;
+	latitude = e.latitude;
+ 	longitude = e.longitude;
 });
 
 Titanium.Geolocation.addEventListener('location', function(e){	
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
 	
-	var upLoadGPS = JSON.stringify() 
-	var postData = 
-	
+	var currentCoordinates = { "coords": [
+				   {"latitude": latitude,
+				   "longitude": longitude}]
+						};
+	var uploadCurrentGPS = JSON.stringify(currentCoordinates); 
 	var updatedLocation = {
 			latitude: e.coords.latitude,
 			longitude: e.coords.longitude,
@@ -133,7 +135,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		animate:true
 				});
 	mapView.addAnnotation(plotPoints);
-	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
+/*	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
 	if (distanceCalculated <= .000249) {
 		xhr.setTimeout(20000);
 		xhr.open('POST', "http://localhost/comparecoordaintes.php", false);
@@ -142,16 +144,25 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 			Titanium.API.info('IN ERROR' + e.error);
 					};
-		xhr.onload = function(){
+		xhr.onload = function(e)
+			{
+			Titanium.API.info(this.responseText);
+			streamingAudioURL = JSON.parse(this.responseText);
+			var streamer = Titanium.Media.createAudioPlayer();
 			
-		}
-		//This part will return the audio url and you will need to implement the audio player that is within Titanium.
-	};
-			
+			//have audio player play back url received from server
+				};
+		xhr.onsendstream = function(e)
+			{
+			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+				};
+	}; // If end statement */
 			}; // end of for loop
 		}; // end of xhr.onload()
-	xhr.send();
-	
+//		xhr.setRequestHeader("Content-Type", "gps/json");
+//		xhr.send(uploadCurrentGPS);
+		
+		
 	
 	mapView.setLocation(updatedLocation);
 });
