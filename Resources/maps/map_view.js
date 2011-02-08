@@ -79,8 +79,8 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 				animate:true
 				});
 			mapView.addAnnotation(plotPoints);
-			};
-		};
+			}; // end of for loop
+		}; // end of xhr.onload()
 		xhr.send();
 	});
  
@@ -88,14 +88,17 @@ win.add(mapView);
 
 //I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
-	latitude = e.latitude;
- 	longitude = e.longitude;
+	latitude = e.coords.latitude;
+ 	longitude = e.coords.longitude;
 });
 
-//Might be redundant, but this is to change the longitude, latitude values when the user moves more tha 10 meters.
 Titanium.Geolocation.addEventListener('location', function(e){	
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
+	
+	var upLoadGPS = JSON.stringify() 
+	var postData = 
+	
 	var updatedLocation = {
 			latitude: e.coords.latitude,
 			longitude: e.coords.longitude,
@@ -103,7 +106,54 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			latitudeDelta:0.005,
 			longitudeDelta:0.005
 		};
-		mapView.setLocation(updatedLocation);
+	var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
+	Titanium.API.info(geturl);
+	// Begin the "Get data" request
+	var xhr = Titanium.Network.createHTTPClient();
+	xhr.setTimeout(20000);
+	xhr.open('GET', geturl, false);
+	xhr.onerror = function(e)
+		{
+		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+		Titanium.API.info('IN ERROR' + e.error);
+				};
+	xhr.onload = function(){
+	Titanium.API.info(this.responseText);
+	incomingData = JSON.parse(this.responseText);
+	
+	for (var i = 0; i < incomingData.length; i++){
+	recorded = incomingData[i];
+	Titanium.API.info(recorded.Latitude);
+	Titanium.API.info(recorded.Longitude);
+		plotPoints = Titanium.Map.createAnnotation({
+		latitude: recorded.Latitude,
+		longitude: recorded.Longitude,
+		title: 'Memory',
+		pincolor: Titanium.Map.ANNOTATION_GREEN,
+		animate:true
+				});
+	mapView.addAnnotation(plotPoints);
+	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
+	if (distanceCalculated <= .000249) {
+		xhr.setTimeout(20000);
+		xhr.open('POST', "http://localhost/comparecoordaintes.php", false);
+		xhr.onerror = function(e)
+			{
+			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+			Titanium.API.info('IN ERROR' + e.error);
+					};
+		xhr.onload = function(){
+			
+		}
+		//This part will return the audio url and you will need to implement the audio player that is within Titanium.
+	};
+			
+			}; // end of for loop
+		}; // end of xhr.onload()
+	xhr.send();
+	
+	
+	mapView.setLocation(updatedLocation);
 });
 
 	
