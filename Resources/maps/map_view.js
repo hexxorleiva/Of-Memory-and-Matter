@@ -1,6 +1,15 @@
 //Changing the win to = Ti.Ui.currentWindow, just allowed me to declare anytime I wanted to modify something to appear in this window to just
 //add "win." whatever else instead of having to write "Titanium.UI.currentWindow." then "add." over and over.
 var win = Titanium.UI.currentWindow;
+
+/*function openWindow( option, transition ){
+	var curwin = Titanium.UI.currentWindow;
+	if ( curwin && transition ){
+		curwin.close({transition: transition});
+	}
+	Titanium.App.fireEvent('openwindow', {option:option});
+}*/
+
 var latitude;
 var longitude;
 var incomingData;
@@ -92,9 +101,13 @@ mapView.addEventListener('regionChanged', function(e) {
  	longitude = e.longitude;
 });
 
+/*
+
+
 Titanium.Geolocation.addEventListener('location', function(e){	
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
+	var coordinateDifference = [];
 	
 	var currentCoordinates = { "currentcoords": [
 				   {"latitude": latitude,
@@ -119,6 +132,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 		Titanium.API.info('IN ERROR' + e.error);
 				};
+	///////////////////////////////////////////////////////////////////
 	xhr.onload = function(){
 	Titanium.API.info(this.responseText);
 	incomingData = JSON.parse(this.responseText);
@@ -136,40 +150,50 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				});
 	mapView.addAnnotation(plotPoints);	
 	//Here is where it will try and calculate the distance and within a certain radius it will send a POST to the server to retrieve the audio url from the database.
-	var distanceCalculated = sqrt(Math.pow((recorded.Latitude - latitude),2) + (Math.pow(recorded.Longitude - longitude),2));
-	if (distanceCalculated <= .000249) {
-		xhr.setTimeout(20000);
-		xhr.open('POST', "http://localhost/comparecoordaintes.php", false);
-		xhr.onerror = function(e)
-			{
-			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-			Titanium.API.info('IN ERROR' + e.error);
-					};
-		xhr.onload = function(e)
-			{
-			//Receieve the audio url and read it through Titanium
-			Titanium.API.info(this.responseText);
-			//Have variable "streamingAudioURL" equal the incoming echo from php script.
-			streamingAudioURL = JSON.parse(this.responseText);
-			//Begins the player.
-			var streamer = Titanium.Media.createAudioPlayer();
-			
-			//have audio player play back url received from server
+	var latitudeDifference = recorded.Latitude - latitude;
+	var longitudeDifference = recorded.Longitude - longitude;
+	var distanceCalculated = sqrt(Math.pow(latitudeDifference,2) + Math.pow(longitudeDifference,2));
+	if (distanceCalculated <= Math.pow(2.49, -5)) {
+		coordinateDifference = distanceCalculated;
+		} else { coordinateDifference = ''; }; // If/Else end statement
+		}; // end of for loop
+	}; // end of xhr.onload()
+	////////////////////////////////////////////////////////////////
+	//Couldn't at this point there be a return value of the "receieved.Latitude" & "receieved.Longitude" so the server doesn't have to do these math exercises also?
+	//Just return the longitude and latitude values that made the coordinateDifference happen in the first place and then make the server just match those values
+	//with the audio url and play it. A "SELECT FROM audiourl WHERE latitude && longitude == receieved.latitude && receieved.longitude"
+	if(coordinateDifference != null){
+	xhr.setTimeout(20000);
+	xhr.open('POST', "http://localhost/comparecoordaintes.php", false);
+	xhr.onerror = function(e)
+		{
+		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+		Titanium.API.info('IN ERROR' + e.error);
 				};
-		xhr.onsendstream = function(e)
-			{
-			Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
-				};
-	}; // If end statement */
-			}; // end of for loop
-		}; // end of xhr.onload()
+	xhr.onload = function()
+		{
+		//Receieve the audio url and read it through Titanium
+		Titanium.API.info(this.responseText);
+		//Have variable "streamingAudioURL" equal the incoming echo from php script.
+		streamingAudioURL = JSON.parse(this.responseText);
+		//Begins the player.
+		var streamer = Titanium.Media.createAudioPlayer();
+		
+		//have audio player play back url received from server
+			};
+	xhr.onsendstream = function(e)
+		{
+		Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+			};
 //		xhr.setRequestHeader("Content-Type", "gps/json");
 //		xhr.send(uploadCurrentGPS);
-		
+}; // end of If statement		
 		
 	
 	mapView.setLocation(updatedLocation);
 });
+
+*/
 
 	
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
@@ -180,6 +204,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				//I believe that these declare the variables without having them set to anything.
 				var zoomin = null;
 				var zoomout = null;
+				var testbutton = null;
 				
 				/*I have no idea what the "wireClickHandlers" function is suppose to do; I copied this code from the Maps example
 				  from the Titanium Appcelerator KitchenSink. I think these just make the "zoom" variables become functions that
@@ -201,6 +226,11 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				var flexSpace = Titanium.UI.createButton({
 					systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
 				});
+				
+				testbutton = Titanium.UI.createButton({
+					title: 'Testing',
+					style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+				});
 
 				zoomin = Titanium.UI.createButton({
 					title:'Zoom +',
@@ -216,7 +246,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
 				   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
 				   how much spacing is wanted. */
-				win.setToolbar([flexSpace,zoomin,zoomout]);
+				win.setToolbar([flexSpace,zoomin,zoomout, testbutton]);
 
 		} else {
 			var activity = Titanium.Android.currentActivity;
@@ -227,3 +257,10 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				wireClickHandlers();
 			};
 		};
+		
+		testbutton.addEventListener('click', function(){
+			var newwin = Titanium.UI.createWindow({url:'memoryplayback.js',
+			backgroundColor:'Grey',
+			fullscreen:true});
+			newwin.open();
+			});

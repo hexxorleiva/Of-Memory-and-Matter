@@ -45,6 +45,14 @@ var win2 = Titanium.UI.createWindow({
 	title:'Map',
 	backgroundColor:'#000'
 });
+
+win2.open();
+
+Titanium.App.addEventListener('openwindow', function(e){
+	var win = Titanium.UI.createWindow(e.option);
+	win.open();
+});
+
 var tab2 = Titanium.UI.createTab({
 	id:'tab2',
 	icon:'KS_nav_ui.png',
@@ -88,7 +96,6 @@ var label3 = Titanium.UI.createLabel({
 });
 
 win3.add(label3);
-
 //
 
 //
@@ -100,3 +107,4 @@ tabGroup.addTab(tab3);
 
 // open tab group
 tabGroup.open();
+
