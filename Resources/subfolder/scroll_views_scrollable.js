@@ -1,59 +1,6 @@
-/*function getOrientation(o)
-{  //Came from orientation.js, but we didn't need the buttons and such
-	switch (o)
-	{
-		case Titanium.UI.PORTRAIT:
-		{
-			return 'portrait';
-		}
-		case Titanium.UI.UPSIDE_PORTRAIT:
-		{
-			return 'upside portrait';
-		}
-		case Titanium.UI.LANDSCAPE_LEFT:
-		{
-			return 'landscape left';
-		}
-		case Titanium.UI.LANDSCAPE_RIGHT:
-		{
-			return 'landscape right';
-		}
-		case Titanium.UI.FACE_UP:
-		{
-			return 'face up';
-		}
-		case Titanium.UI.FACE_DOWN:
-		{
-			return 'face down';
-		}
-		case Titanium.UI.UNKNOWN:
-		{
-			return 'unknown';
-		}
-	}
-}
-*/
 
 var win = Titanium.UI.currentWindow;
 win.backgroundColor = '#000';
-
-// initialize to all modes
-win.orientationModes = [
-	Titanium.UI.PORTRAIT,
-	Titanium.UI.LANDSCAPE_LEFT,
-	Titanium.UI.LANDSCAPE_RIGHT,
-];
-
-
-//
-// orientation change listener
-//
-Ti.Gesture.addEventListener('orientationchange',function(e)
-{
-
-	// get orienation from event object
-	var orientation = getOrientation(e.orientation);
-});
 
 var view1 = Ti.UI.createView({
 	backgroundColor:'black'

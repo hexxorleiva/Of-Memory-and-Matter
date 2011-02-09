@@ -5,6 +5,15 @@ Titanium.UI.setBackgroundColor('#000');
 var tabGroup = Titanium.UI.createTabGroup({id:'tabGroup1'});
 
 
+var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
+if (newDir.exists('mydir')){
+Titanium.API.info('Directory already exists');
+} else {
+newDir.createDirectory();
+Titanium.API.info('Path to newdir: ' + newDir.nativePath);
+};
+
+
 //
 // create base UI tab and root window
 //
