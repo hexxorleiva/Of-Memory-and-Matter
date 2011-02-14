@@ -8,6 +8,7 @@ var incomingData;
 var recorded = [];
 var plotPoints;
 var updateAnnotations;
+var uploadGPS = '';
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
@@ -102,12 +103,15 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	latitude = e.coords.latitude;
 	longitude = e.coords.longitude;
 	var coordinateDifference = [];
-	
+
 	var currentCoordinates = { "currentcoords": [
 				   {"latitude": latitude,
 				   "longitude": longitude}]
 						};
-	var uploadCurrentGPS = JSON.stringify(currentCoordinates); 
+
+	var uploadCurrentGPS = JSON.stringify(currentCoordinates);
+	
+
 	var updatedLocation = {
 			latitude: e.coords.latitude,
 			longitude: e.coords.longitude,
@@ -151,7 +155,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	var distanceCalculated = sqrt(Math.pow(latitudeDifference,2) + Math.pow(longitudeDifference,2));
 	if (distanceCalculated <= Math.pow(2.49, -5)) {
 		coordinateDifference = distanceCalculated;
-		
 		} else { coordinateDifference = ''; }; // If/Else end statement
 			}; // end of for loop
 	}; // end of xhr.onload()
@@ -160,11 +163,13 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	//Just return the longitude and latitude values that made the coordinateDifference happen in the first place and then make the server just match those values
 	//with the audio url and play it. A "SELECT FROM audiourl WHERE latitude && longitude == receieved.latitude && receieved.longitude"
 	if(coordinateDifference != ''){
-		var newwin = Titanium.UI.createWindow({url:'memoryplayback.js',
+		var newwin = Titanium.UI.createWindow({
+		url:'memoryplayback.js',
 		backgroundColor:'Grey',
-		fullscreen:true});
+		fullscreen:true
+	});
 		newwin.open();
-}; // end of If statement		
+};// end of If statement
 		
 	
 	mapView.setLocation(updatedLocation);
@@ -201,11 +206,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				var flexSpace = Titanium.UI.createButton({
 					systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
 				});
-				
-				testbutton = Titanium.UI.createButton({
-					title: 'Testing',
-					style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-				});
 
 				zoomin = Titanium.UI.createButton({
 					title:'Zoom +',
@@ -221,7 +221,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
 				   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
 				   how much spacing is wanted. */
-				win.setToolbar([flexSpace,zoomin,zoomout, testbutton]);
+				win.setToolbar([flexSpace,zoomin,zoomout]);
 
 		} else {
 			var activity = Titanium.Android.currentActivity;
@@ -232,10 +232,3 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				wireClickHandlers();
 			};
 		};
-		
-		testbutton.addEventListener('click', function(){
-			var newwin = Titanium.UI.createWindow({url:'memoryplayback.js',
-			backgroundColor:'Grey',
-			fullscreen:true});
-			newwin.open();
-			});
