@@ -15,12 +15,16 @@ var win = Titanium.UI.currentWindow;
 
 //Establishes the Table
 var tableData = [];
-var CustomData = [{ title:"Please wait."}];
-var tableView = Titanium.UI.createTableView({
-	data: tableData,
-	style:Titanium.UI.iPhone.TableViewStyle.GROUPED
-	});
+var CustomData = [];
+var tableView = Titanium.UI.createTableView({});
 win.add(tableView);
+
+var mp3_url = [];
+var audiourls = [];
+var audioData = [];
+
+//Audio
+var stream = Titanium.Media.createAudioPlayer();
 
 //Global Variables
 var incomingData;
@@ -40,7 +44,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		var longitude = e.coords.longitude;
 		var latitude = e.coords.latitude;
 		
-		var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude;
+		var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude; //comparecoordinates.php
 		//Titanium.API.info(geturl);
 		// Begin the "Get data" request
 		var xhr = Titanium.Network.createHTTPClient();
@@ -59,24 +63,44 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 			//Titanium.API.info(jsonData.Timestamp);
 			//Titanium.API.info(incomingData[i].AudioURL);
 			CustomData = incomingData[i];
-			Titanium.API.info(CustomData.AudioURL);
+			//Titanium.API.info(CustomData.AudioURL);
 		
 		// Create a vertical layout view to hold all the info
-		var row = Titanium.UI.createTableViewRow({height:50});
+		var row = Titanium.UI.createTableViewRow({
+			height:50
+			});
+			
 	 	var audioText = Titanium.UI.createLabel({
 			text: CustomData.AudioURL,
-			font: {fontSize:12,fontWeight:'bold'},
+			font: {fontSize:14,fontWeight:'bold'},
 			width: 'auto',
 			textAlign:'left',
+			top: 7,
 			height:12,
 			left:10,
 			color:'#333333'
 			});
 			
+		var timeStamptext = Titanium.UI.createLabel({
+			text: CustomData.Timestamp,
+			font: {fontSize:12,fontWeight:'bold'},
+			width: 'auto',
+			textAlign:'left',
+			top: 35,
+			height:12,
+			left:10,
+			color:'#333333'
+			});
+		
+		var mp3_url = CustomData.AudioURL;
 			
+			row.add(timeStamptext);
 			row.add(audioText);
 			row.className = 'audiourl';
-			row.hasChild=CustomData.hasChild;
+			row.hasChild = CustomData.AudioURL;
+			row.thisMp3 = mp3_url;
+			
+			//audiourls = CustomData.AudioURL;			
 			tableData.push(row); 
 			
 			}; //end of For loop
@@ -86,8 +110,14 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		xhr.send();
 }); //end of getCurrentPosition
 
-
-/*
+//EventListener
+tableView.addEventListener('click', function(e){
+	//When link is clicked
+	Titanium.API.info('item index clicked :'+e.index);
+	Titanium.API.info(e.data);
+	Ti.API.info("Row object  = "+e.row);
+	Ti.API.info(e.rowData.thisMp3);
+});
 
 //Established function to allow user know when last time refresh was pulled
 function formatDate()
@@ -107,7 +137,7 @@ function formatDate()
 
 //This is the array that needs to be changed in order to accept the coordinates returned from the HTTPClient protocal
 
-var lastRow = 4;
+//var lastRow = 4;
 
 
 win.add(tableView);
@@ -176,6 +206,7 @@ tableHeader.add(actInd);
 
 tableView.headerPullView = tableHeader;
 
+///////////////////////////////////////////////////////////////
 
 var pulling = false;
 var reloading = false;
@@ -185,6 +216,8 @@ function beginReloading()
 	// just mock out the reload
 	setTimeout(endReloading,2000);
 }
+
+//Remember tableData
 
 function endReloading()
 {
@@ -198,8 +231,8 @@ function endReloading()
 			var longitude = e.coords.longitude;
 			var latitude = e.coords.latitude;
 
-			var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude;
-			Titanium.API.info(geturl);
+			var geturl="http://localhost/comparecoodinates.php?latitude="+latitude+"longitude="+longitude;
+			//Titanium.API.info(geturl);
 			// Begin the "Get data" request
 			var xhr = Titanium.Network.createHTTPClient();
 			xhr.setTimeout(20000);
@@ -210,43 +243,39 @@ function endReloading()
 				Titanium.API.info('IN ERROR' + e.error);
 						};
 			///////////////////////////////////////////////////////////////////
-					xhr.onload = function(){
-					Titanium.API.info(this.responseText);
-					incomingData = JSON.parse(this.responseText);
-					for (var i = 0; i < incomingData.length; i++){
-						jsonData = incomingData[i];
-						//Titanium.API.info(jsonData.Timestamp);
-						Titanium.API.info(jsonData.AudioURL);
+			xhr.onload = function(){
+			Titanium.API.info(this.responseText);
+			incomingData = JSON.parse(this.responseText);
+			for (var i = 0; i < incomingData.length; i++){
+				//Titanium.API.info(jsonData.Timestamp);
+				//Titanium.API.info(incomingData[i].AudioURL);
+				CustomData = incomingData[i];
+				Titanium.API.info(CustomData.AudioURL);
 
-					var row = Titanium.UI.createTableViewRow();
+			// Create a vertical layout view to hold all the info
+			var row = Titanium.UI.createTableViewRow({height:50});
+		 	var audioText = Titanium.UI.createLabel({
+				text: CustomData.AudioURL,
+				font: {fontSize:12,fontWeight:'bold'},
+				width: 'auto',
+				textAlign:'left',
+				height:12,
+				left:10,
+				color:'#333333'
+				});
 
-					var audioURLText = Titanium.UI.createLabel({
-						text:jsonData.AudioURL,
-						font:{fontSize:12,fontWeight:'bold'},
-						top:2,
-						left:20,
-						width:'auto',
-						textAlign:'left'
-						//className: 'tableLeft'
-						});
-						row.add(audioURLText);
-						//row.className = 'audiourl';
-						//row.hasChild=jsonData.hasChild;
-						tableData.push(row);
-						}; //end of For loop
-					}; //end of onload
 
-					xhr.send();
-			}); //end of getCurrentPosition
+				row.add(audioText);
+				row.className = 'audiourl';
+				row.hasChild=CustomData.hasChild;
+				tableData.push(row); 
 
-	// simulate loading
+				}; //end of For loop
+				tableView.setData(tableData);
+			}; //end of onload
 
-	for (var c=lastRow;c<lastRow+10;c++)
-	{
-		tableView.appendRow({title:"Row "+c});
-	}
-	lastRow += 10;
-
+			xhr.send();
+	}); //end of getCurrentPosition
 
 	// when you're done, just reset
 	tableView.setContentInsets({top:0},{animated:true});
@@ -291,5 +320,3 @@ tableView.addEventListener('scrollEnd',function(e)
 		beginReloading();
 	}
 });
-
-*/
