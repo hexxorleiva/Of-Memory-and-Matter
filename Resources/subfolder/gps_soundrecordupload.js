@@ -28,7 +28,7 @@ var recording = Ti.Media.createAudioRecorder();
 var file;
 var sound;
 var audioName = 'recording';
-var newAudiofile = 'recording.wav';
+var newAudiofile = 'recording.mp4'; //recording.wav
 var file_recorded = Titanium.Filesystem.getFile(newDir.nativePath, newAudiofile); //audioSample
 upload_audio = file_recorded.read();
 // default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
@@ -38,8 +38,8 @@ upload_audio = file_recorded.read();
 // is a generally small size and suitable for telephony recording
 // for high end quality, you'll want LINEAR PCM - however, that
 // will result in uncompressed audio and will be very large in size
-recording.compression = Ti.Media.AUDIO_FORMAT_ULAW;
-recording.format = Ti.Media.AUDIO_FILEFORMAT_WAVE;
+recording.compression = Ti.Media.AUDIO_FORMAT_AAC; //Was Ti.Media.AUDIO_FORMAT_ULAW
+recording.format = Ti.Media.AUDIO_FILEFORMAT_MP4; //Was Ti.Media.AUDIO_FILEFORMAT_WAVE
 
 //
 //Geolocation Global Identifiers
@@ -143,7 +143,7 @@ win.add(start);
 		{
 			file = recording.stop();
 			//Adding line to create a file instead of just replacing the recording.wav file
-			newAudiofile = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.wav');
+			newAudiofile = Titanium.Filesystem.getFile(newDir.nativePath, 'recording.mp4');
 			//newAudiofile.write(file.toBlob);
 			if (newAudiofile.exists()) {
 				newAudiofile.deleteFile();
