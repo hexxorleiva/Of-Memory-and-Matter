@@ -25,6 +25,11 @@ var audiourls = [];
 //Audio
 var streamer = Titanium.Media.createAudioPlayer();
 
+//Buttons
+var playButton;
+var previousButton;
+var nextButton;
+
 //Global Variables
 var incomingData;
 
@@ -89,12 +94,14 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		
 		//Declare variable "stream_URL" as an array that when "while loop" continues to fill array with audio URL location
 		var stream_url = CustomData.AudioURL;
+		var dataTimestamp = CustomData.Timestamp;
 			
 			row.add(timeStamptext);
 			row.add(audioText);
 			row.className = 'audiourl';
 			row.hasChild = CustomData.AudioURL;
 			row.thisStream = stream_url;
+			row.dataTimestamp = dataTimestamp;
 			
 			//audiourls = CustomData.AudioURL;			
 			tableData.push(row); 
@@ -107,17 +114,103 @@ Titanium.Geolocation.addEventListener('location', function(e){
 }); //end of getCurrentPosition
 
 tableView.addEventListener('click', function(e){
+	
 	//When link is clicked
 	Titanium.API.info('item index clicked :'+e.index);
 	//Titanium.API.info(e.data);
 	Ti.API.info("Row object  = "+e.row);
 	Ti.API.info('http://localhost/'+e.rowData.thisStream);
 	
+	//When table view is hit, create a view that renders the rest of the options visible, but to focus on the
+	//buttons bar at the bottom.
+	
+	//Done System Button
+	var buttonDone = Titanium.UI.createButtonBar({
+	    systemButton:Titanium.UI.iPhone.SystemButton.DONE
+	});
+	
+	win.setRightNavButton(buttonDone);
+	
+	//Create view that will block out the other Table options
+	var view = Titanium.UI.createView({
+		backgroundColor:'black',
+		width: 320,
+		height: 460,
+		opacity: 0.8
+	});
+	
+	win.add(view);
+	
+	var clearButton = Titanium.UI.createButton({
+		width: 320,
+		height: 460,
+		opacity: 0.1
+	});
+	
+	win.add(clearButton);
+	
+	//Add Play button
+	playButton = Titanium.UI.createButton({
+		title:'Play',
+		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
+		enabled:true
+		});
+	//When Play button is hit, return this eventListener	
+		playButton.addEventListener('click', function() {
+			Ti.API.info('Clicked Play Button!');
+		});
+	//Add Previous button 
+	previousButton = Titanium.UI.createButton({
+		title:'Previous',
+		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
+		enabled:true
+		});
+	//When Previous button is hit, return this eventListener
+		previousButton.addEventListener('click', function() {
+			Titanium.API.info('Clicked Previous Button!');
+		});
+	//Add Next Button
+	nextButton = Titanium.UI.createButton({
+		title:'Next',
+		style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
+		enabled:true
+		});
+	//When Next button is hit, return this eventListener
+		nextButton.addEventListener('click', function() {
+		Titanium.API.info('Clicked Next Button!');
+		});
+	//Used to keep the buttons spaced apart equally
+	var flexSpace = Titanium.UI.createButton({
+		systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+		});
+	
+	//This sets the toolbar at the button and locations of where the buttons are
+	win.setToolbar([playButton,flexSpace,previousButton,flexSpace,nextButton], {translucent:true});
+	/*
 	streamer.stop();
 	streamer.url = 'http://localhost/'+e.rowData.thisStream;
 	//'http://hectorleiva.com/media/2011-02-15-145044.mp3'
 	streamer.start();
+	*/
+	
+	buttonDone.addEventListener('click', function(){
+		Titanium.API.info('Pressed Done Button!');
+		win.close(view);
+	});
+	
+	clearButton.addEventListener('click', function(){
+		Titanium.API.info('Clicked Clear!');
+		win.remove(view);
+		//Have to reset the window.Toolbar to "null" in order to hide it, and animate for "true" to make it flashy.
+		win.setToolbar(null, {animated:true});
+		win.remove(clearButton);
+		//Titanium.UI.Toolbar.remove(view);
+	});
+	
 });
+
+
+
 
 //Established function to allow user know when last time refresh was pulled
 function formatDate()
