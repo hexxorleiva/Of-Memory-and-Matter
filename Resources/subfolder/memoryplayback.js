@@ -203,6 +203,7 @@ tableView.addEventListener('click', function(e){
 		win.setToolbar(null, {animated:true});
 		buttonDone.hide();
 		win.rightNavButton = null;
+		clearButton.hide();
 	});
 	
 	clearButton.addEventListener('click', function(){
@@ -212,6 +213,9 @@ tableView.addEventListener('click', function(e){
 		//Have to reset the window.Toolbar to "null" in order to hide it, and animate for "true" to make it flashy.
 		win.setToolbar(null, {animated:true});
 		win.remove(clearButton);
+		buttonDone.hide();
+		win.rightNavButton = null;
+		clearButton.hide();
 	});
 	
 });
