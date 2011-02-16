@@ -109,7 +109,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			}; //end of For loop
 			tableView.setData(tableData);
 		}; //end of onload
-		
 		xhr.send();
 }); //end of getCurrentPosition
 
@@ -125,8 +124,9 @@ tableView.addEventListener('click', function(e){
 	//buttons bar at the bottom.
 	
 	//Done System Button
-	var buttonDone = Titanium.UI.createButtonBar({
-	    systemButton:Titanium.UI.iPhone.SystemButton.DONE
+	var buttonDone = Titanium.UI.createButton({
+	    systemButton:Titanium.UI.iPhone.SystemButton.DONE,
+		right:50
 	});
 	
 	win.setRightNavButton(buttonDone);
@@ -156,8 +156,12 @@ tableView.addEventListener('click', function(e){
 		enabled:true
 		});
 	//When Play button is hit, return this eventListener	
-		playButton.addEventListener('click', function() {
-			Ti.API.info('Clicked Play Button!');
+	playButton.addEventListener('click', function() {
+		Ti.API.info('Clicked Play Button!');
+		streamer.stop();
+		streamer.url = 'http://localhost/'+e.rowData.thisStream;
+		//'http://hectorleiva.com/media/2011-02-15-145044.mp3'
+		streamer.start();
 		});
 	//Add Previous button 
 	previousButton = Titanium.UI.createButton({
@@ -166,8 +170,8 @@ tableView.addEventListener('click', function(e){
 		enabled:true
 		});
 	//When Previous button is hit, return this eventListener
-		previousButton.addEventListener('click', function() {
-			Titanium.API.info('Clicked Previous Button!');
+	previousButton.addEventListener('click', function() {
+		Titanium.API.info('Clicked Previous Button!');
 		});
 	//Add Next Button
 	nextButton = Titanium.UI.createButton({
@@ -176,7 +180,7 @@ tableView.addEventListener('click', function(e){
 		enabled:true
 		});
 	//When Next button is hit, return this eventListener
-		nextButton.addEventListener('click', function() {
+	nextButton.addEventListener('click', function() {
 		Titanium.API.info('Clicked Next Button!');
 		});
 	//Used to keep the buttons spaced apart equally
@@ -195,16 +199,19 @@ tableView.addEventListener('click', function(e){
 	
 	buttonDone.addEventListener('click', function(){
 		Titanium.API.info('Pressed Done Button!');
-		win.close(view);
+		win.remove(view);
+		win.setToolbar(null, {animated:true});
+		buttonDone.hide();
+		win.rightNavButton = null;
 	});
 	
 	clearButton.addEventListener('click', function(){
 		Titanium.API.info('Clicked Clear!');
 		win.remove(view);
+		streamer.stop();
 		//Have to reset the window.Toolbar to "null" in order to hide it, and animate for "true" to make it flashy.
 		win.setToolbar(null, {animated:true});
 		win.remove(clearButton);
-		//Titanium.UI.Toolbar.remove(view);
 	});
 	
 });
