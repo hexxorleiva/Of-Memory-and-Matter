@@ -10,7 +10,7 @@ GPS:
 */
 var win = Titanium.UI.currentWindow;
 
-//	Creation of a new Directory to store both GPS and audio files. Will check if directory exists.
+//Creation of a new Directory to store both GPS and audio files. Will check if directory exists.
 var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
 if (newDir.exists('mydir')){
 Titanium.API.info('Directory already exists');
