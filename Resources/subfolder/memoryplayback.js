@@ -44,7 +44,7 @@ Titanium.Geolocation.distanceFilter = 10;
 
 function getMovingLocation() {
 	
-Titanium.Geolocation.getCurrentPosition(function(e){
+Titanium.Geolocation.addEventListener('location', function(e){
 		if (!e.success || e.error)
 		{
 			Titanium.UI.createAlertDialog('error ' + JSON.stringify(e.error));
@@ -139,10 +139,9 @@ getMovingLocation();
 	});
 	win.setRightNavButton(reloadButton);
 	
-	reloadButton.addEventListener('click', function(){
-		Titanium.API.info('Reload Button has been pressed!');
+	reloadButton.addEventListener('click', function() {
 		getMovingLocation();
-		
+		Titanium.API.info('Reload Button has been pressed!');
 	});
 
 //
@@ -260,6 +259,7 @@ tableView.addEventListener('click', function(e){
 		win.setToolbar(null, {animated:true});
 		buttonDone.hide();
 		win.rightNavButton = null;
+		win.setRightNavButton(reloadButton);
 	});
 	
 	//	This sets the toolbar at the button and locations of where the buttons are
@@ -267,7 +267,7 @@ tableView.addEventListener('click', function(e){
 	
 });
 
-
+/* This section is taken off because I don't want to be so fancy.
 
 
 //Established function to allow user know when last time refresh was pulled
@@ -431,3 +431,5 @@ tableView.addEventListener('scrollEnd',function(e)
 		beginReloading();
 	}
 });
+
+*/

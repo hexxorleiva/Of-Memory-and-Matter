@@ -297,7 +297,7 @@ var updatedLocation = Titanium.UI.createLabel({
 win.add(updatedLocation);
 
 var updatedLatitude = Titanium.UI.createLabel({
-	text:'',
+	text:'Updated Latitude not fired',
 	font:{fontSize:11},
 	color:'#444',
 	top:320, // + 40 difference
