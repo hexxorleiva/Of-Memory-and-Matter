@@ -100,8 +100,8 @@ mapView.addEventListener('regionChanged', function(e) {
 //
 
 Titanium.Geolocation.addEventListener('location', function(e){	
-	latitude = e.coords.latitude;
-	longitude = e.coords.longitude;
+	latitude = coords.latitude;
+	longitude = coords.longitude;
 	var coordinateDifference = [];
 
 	var currentCoordinates = { "currentcoords": [
