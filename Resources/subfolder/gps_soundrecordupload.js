@@ -80,6 +80,8 @@ var postData = {
 ////////////////////////////////////////////////////////////////////
 
 // Get Current Position - This fires only once
+/*
+
 Titanium.Geolocation.getCurrentPosition(function(e){
 		if (!e.success || e.error)
 		{
@@ -101,6 +103,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 		newFile.write(JSON.stringify(datatoWrite));
 
 });
+*/
 
 Titanium.Geolocation.addEventListener('location', function(e){
 		if (!e.success || e.error)
@@ -274,7 +277,7 @@ win.add(upload);
 
 //
 
-var updatedLocationLabel = Titanium.UI.createLabel({
+	updatedLocationLabel = Titanium.UI.createLabel({
 	text:'Updated Location',
 	font:{fontSize:12, fontWeight:'bold'},
 	color:'#111',
@@ -285,7 +288,7 @@ var updatedLocationLabel = Titanium.UI.createLabel({
 });
 win.add(updatedLocationLabel);
 
-var updatedLocation = Titanium.UI.createLabel({
+	updatedLocation = Titanium.UI.createLabel({
 	text:'Updated Location not fired',
 	font:{fontSize:11},
 	color:'#444',
@@ -296,7 +299,7 @@ var updatedLocation = Titanium.UI.createLabel({
 });
 win.add(updatedLocation);
 
-var updatedLatitude = Titanium.UI.createLabel({
+	updatedLatitude = Titanium.UI.createLabel({
 	text:'Updated Latitude not fired',
 	font:{fontSize:11},
 	color:'#444',
