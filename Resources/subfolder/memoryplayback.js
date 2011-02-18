@@ -16,7 +16,7 @@ var win = Titanium.UI.currentWindow;
 //Establishes the Table
 var tableData = [];
 var CustomData = [];
-var tableView = Titanium.UI.createTableView({});
+var tableView = Titanium.UI.createTableView({minRowHeight:60});
 win.add(tableView);
 
 var stream_url = [];
@@ -44,7 +44,7 @@ Titanium.Geolocation.distanceFilter = 10;
 
 function getMovingLocation() {
 	
-Titanium.Geolocation.addEventListener('location', function(e){
+Titanium.Geolocation.getCurrentPosition(function(e){
 		if (!e.success || e.error)
 		{
 			Titanium.UI.createAlertDialog('error ' + JSON.stringify(e.error));
@@ -65,6 +65,8 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			Titanium.API.info('IN ERROR' + e.error);
 					};
 		///////////////////////////////////////////////////////////////////
+		try
+			{
 		xhr.onload = function(){
 		Titanium.API.info(this.responseText);
 		incomingData = JSON.parse(this.responseText);
@@ -104,21 +106,24 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			
 			row.add(timeStamptext);
 			row.add(audioText);
-			row.className = 'audiourl';
-			//row.hasChild = CustomData;
+			row.className = 'audiourl'+i;
 			row.thisStream = stream_url;
 			row.dataTimestamp = dataTimestamp;
 			
 			//audiourls = CustomData.AudioURL;			
 			tableData.push(row); 
-			
 			}; //end of For loop
-			Titanium.API.info(row.index);
+			
 			tableView.setData(tableData);
+			
 		}; //end of onload
+				} //end of Try
+		catch(E){
+			alert(E);
+			}
+		
 		xhr.send();
-}); //end of location
-
+}); //end of getlocation
 }; // end of getMovingLocation();
 
 //Call get moving location function
