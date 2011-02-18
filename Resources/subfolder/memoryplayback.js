@@ -57,45 +57,20 @@ function displayItems() {
 	var row = Titanium.UI.createTableViewRow({
 		hasChild:true
 		});
+	// Takes easytime data from mySQL database and populates it as a label
 	var easyTime = Titanium.UI.createLabel({
 		text: CustomData.easytime,
 		font: {fontSize:16,fontWeight:'bold'},
 		width: 'auto',
 		textAlign:'left',
-		top: 10,
+		top: 8,
 		left:10,
 		color:'#333333'
 		});
-	//	This variable will denote the audio URL from AudioURL from MySQL database	
- 	/*
-var audioText = Titanium.UI.createLabel({
-		text: CustomData.AudioURL,
-		font: {fontSize:14,fontWeight:'bold'},
-		width: 'auto',
-		textAlign:'left',
-		top: 7,
-		height:12,
-		left:10,
-		color:'#333333'
-		});
-	//	This variable will create the label that denotes Timestamp from MySQL database
-	var timeStamptext = Titanium.UI.createLabel({
-		text: CustomData.Timestamp,
-		font: {fontSize:12,fontWeight:'bold'},
-		width: 'auto',
-		textAlign:'left',
-		top: 35,
-		height:12,
-		left:10,
-		color:'#333333'
-		});
-	*/
+
 	//	Declare variable "stream_URL" as an array that when "while loop" continues to fill array with audio URL location
 	var stream_url = CustomData.AudioURL;
 	var dataTimestamp = CustomData.Timestamp;
-		
-		//row.add(timeStamptext);
-		//row.add(audioText);
 		row.add(easyTime);
 		row.className = 'audiourl'+i;
 		row.thisStream = stream_url;
@@ -264,8 +239,7 @@ tableView.addEventListener('click', function(e){
 	
 	rewindButton.addEventListener('click', function() {
 		Titanium.API.info('Clicked Rewind Button!');
-		soundPlayer.stop();
-		progressBar.value=0;
+
 	});
 	
 	var i = setInterval(function()
@@ -306,6 +280,8 @@ tableView.addEventListener('click', function(e){
 		buttonDone.hide();
 		win.rightNavButton = null;
 		win.setRightNavButton(reloadButton);
+		soundPlayer.stop();
+		progressBar.value=0;
 	});
 	
 	//	This sets the toolbar at the button and locations of where the buttons are

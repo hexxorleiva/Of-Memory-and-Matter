@@ -43,6 +43,7 @@ var mapView = Titanium.Map.createView({
 });
  
 //THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK. Gets the user's current location.
+/*
 Titanium.Geolocation.getCurrentPosition(function(e){
         var region={
             latitude: e.coords.latitude,
@@ -87,6 +88,7 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 	});
  
 win.add(mapView);
+*/
 
 //I believe when the user changes their position, the map will follow them.
 mapView.addEventListener('regionChanged', function(e) {
@@ -99,9 +101,18 @@ mapView.addEventListener('regionChanged', function(e) {
 // If location changes 10m. Grab coordinates, update Map. If coordinates match within a certain radius of the coordinates in the database, change window to "memoryplayback.js"
 //
 
-Titanium.Geolocation.addEventListener('location', function(e){	
-	latitude = coords.latitude;
-	longitude = coords.longitude;
+Titanium.Geolocation.addEventListener('location', function(e){
+	var region={
+        latitude: e.coords.latitude,
+        longitude: e.coords.longitude,
+        animate:true,
+        latitudeDelta:0.005,
+        longitudeDelta:0.005
+    };
+    mapView.setLocation(region);
+
+	var latitude = e.coords.latitude;
+	var longitude = e.coords.longitude;
 	var coordinateDifference = [];
 
 	var currentCoordinates = { "currentcoords": [
@@ -152,7 +163,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	xhr.send();
 	mapView.setLocation(updatedLocation);
 });
-
+win.add(mapView);
 	
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
 					For this to work I had to delete all the files already complied in the "build/iphone" folder within the project

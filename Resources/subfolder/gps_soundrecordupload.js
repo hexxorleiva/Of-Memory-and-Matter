@@ -10,7 +10,7 @@ GPS:
 */
 var win = Titanium.UI.currentWindow;
 
-//Creation of a new Directory to store both GPS and audio files. Will check if directory exists.
+//	Creation of a new Directory to store both GPS and audio files. Will check if directory exists.
 var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
 if (newDir.exists('mydir')){
 Titanium.API.info('Directory already exists');
@@ -20,7 +20,7 @@ Titanium.API.info('Path to newdir: ' + newDir.nativePath);
 };
 
 //
-//Recording Audio Global Identifiers
+//	Recording Audio Global Identifiers
 //
 
 Titanium.Media.audioSessionMode = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
@@ -47,7 +47,7 @@ recording.compression = Ti.Media.AUDIO_FORMAT_AAC; //Was Ti.Media.AUDIO_FORMAT_U
 recording.format = Ti.Media.AUDIO_FILEFORMAT_MP4; //Was Ti.Media.AUDIO_FILEFORMAT_WAVE
 
 //
-//Geolocation Global Identifiers
+//	Geolocation Global Identifiers
 //
 
 var uploadGPS = '';
@@ -68,7 +68,7 @@ var uploadGPS = gps_recorded.read();
 Titanium.API.info(uploadGPS);
 
 //
-//HTTPClient "Payload" Global Identifiers
+//	HTTPClient "Payload" Global Identifiers
 //
 
 var postData = {
@@ -78,32 +78,6 @@ var postData = {
 				};
 
 ////////////////////////////////////////////////////////////////////
-
-// Get Current Position - This fires only once
-/*
-
-Titanium.Geolocation.getCurrentPosition(function(e){
-		if (!e.success || e.error)
-		{
-			currentLocation.text = 'error: ' + JSON.stringify(e.error);
-			alert('error ' + JSON.stringify(e.error));
-			return;
-		}
-		var longitude = e.coords.longitude;
-		var latitude = e.coords.latitude;
-		
-		//Establishes a JSON array for GPS
-		var datatoWrite = {
-							"longitude":longitude,
-							"latitude":latitude
-										};
-		
-		//Data to write?
-		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,"coordinates.JSON");
-		newFile.write(JSON.stringify(datatoWrite));
-
-});
-*/
 
 Titanium.Geolocation.addEventListener('location', function(e){
 		if (!e.success || e.error)
@@ -132,7 +106,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 ////////////////////////////////////////////////////////////////////
 
 //
-//Button - Start Recording
+//	Button - Start Recording
 //
 
 var start = Titanium.UI.createButton({	
@@ -179,7 +153,7 @@ win.add(start);
 });
 
 //
-//Button - Playback Recording
+//	Button - Playback Recording
 //
 
 var b2 = Titanium.UI.createButton({
@@ -224,7 +198,7 @@ win.add(b2);
 });
 
 //
-//Button - Upload Audio
+//	Button - Upload Audio
 //
 
 var upload = Titanium.UI.createButton({
