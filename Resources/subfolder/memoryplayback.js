@@ -44,7 +44,7 @@ Titanium.Geolocation.distanceFilter = 10;
 
 function getMovingLocation() {
 	
-Titanium.Geolocation.addEventListener('location', function(e){
+Titanium.Geolocation.getCurrentPosition(function(e){
 		if (!e.success || e.error)
 		{
 			Titanium.UI.createAlertDialog('error ' + JSON.stringify(e.error));
@@ -127,7 +127,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 }; // end of getMovingLocation();
 
 //Call get moving location function
-getMovingLocation();
+//getMovingLocation();
 
 //
 //	Reload Button
