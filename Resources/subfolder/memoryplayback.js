@@ -43,7 +43,7 @@ Titanium.Geolocation.distanceFilter = 10;
 //
 
 function getMovingLocation() {
-
+	
 Titanium.Geolocation.addEventListener('location', function(e){
 		if (!e.success || e.error)
 		{
@@ -73,7 +73,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		
 		// Create a vertical layout view to hold all the info
 		var row = Titanium.UI.createTableViewRow({
-			height:50
+			hasChild:true
 			});
 		//This variable will denote the audio URL from AudioURL from MySQL database	
 	 	var audioText = Titanium.UI.createLabel({
@@ -105,7 +105,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			row.add(timeStamptext);
 			row.add(audioText);
 			row.className = 'audiourl';
-			row.hasChild = CustomData.AudioURL;
+			//row.hasChild = CustomData;
 			row.thisStream = stream_url;
 			row.dataTimestamp = dataTimestamp;
 			
@@ -113,6 +113,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			tableData.push(row); 
 			
 			}; //end of For loop
+			Titanium.API.info(row.index);
 			tableView.setData(tableData);
 		}; //end of onload
 		xhr.send();
@@ -135,6 +136,7 @@ getMovingLocation();
 	
 	reloadButton.addEventListener('click', function(){
 		Titanium.API.info('Reload Button has been pressed!');
+		getMovingLocation();
 		
 	});
 
@@ -362,88 +364,14 @@ function beginReloading()
 
 function tryToReload()
 {
-	Titanium.Geolocation.getCurrentPosition(function(e){
-			if (!e.success || e.error)
-			{
-				currentLocation.text = 'error: ' + JSON.stringify(e.error);
-				alert('error ' + JSON.stringify(e.error));
-				return;
-			}
-			var longitude = e.coords.longitude;
-			var latitude = e.coords.latitude;
 
-			var geturl="http://localhost/comparecoodinates.php?latitude="+latitude+"longitude="+longitude;
-			//Titanium.API.info(geturl);
-			// Begin the "Get data" request
-			var xhr = Titanium.Network.createHTTPClient();
-			xhr.setTimeout(20000);
-			xhr.open('GET', geturl, false);
-			xhr.onerror = function(e)
-				{
-				Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-				Titanium.API.info('IN ERROR' + e.error);
-						};
-			///////////////////////////////////////////////////////////////////
-			xhr.onload = function(){
-			Titanium.API.info(this.responseText);
-			incomingData = JSON.parse(this.responseText);
-			for (var i = 0; i < incomingData.length; i++){
-				CustomData = incomingData[i];
-
-			// Create a vertical layout view to hold all the info
-			var row = Titanium.UI.createTableViewRow({
-				height:50
-				});
-			//This variable will denote the audio URL from AudioURL from MySQL database	
-		 	var audioText = Titanium.UI.createLabel({
-				text: CustomData.AudioURL,
-				font: {fontSize:14,fontWeight:'bold'},
-				width: 'auto',
-				textAlign:'left',
-				top: 7,
-				height:12,
-				left:10,
-				color:'#333333'
-				});
-			//This variable will create the label that denotes Timestamp from MySQL database
-			var timeStamptext = Titanium.UI.createLabel({
-				text: CustomData.Timestamp,
-				font: {fontSize:12,fontWeight:'bold'},
-				width: 'auto',
-				textAlign:'left',
-				top: 35,
-				height:12,
-				left:10,
-				color:'#333333'
-				});
-
-			//Declare variable "stream_URL" as an array that when "while loop" continues to fill array with audio URL location
-			var stream_url = CustomData.AudioURL;
-
-				row.add(timeStamptext);
-				row.add(audioText);
-				row.className = 'audiourl';
-				row.hasChild = CustomData.AudioURL;
-				row.thisStream = stream_url;
-
-				//audiourls = CustomData.AudioURL;			
-				tableData.push(row); 
-
-				}; //end of For loop
-				tableView.setData(tableData);
-			}; //end of onload
-
-			xhr.send();
-	}); //end of getCurrentPosition
-
-	/*
 	// when you're done, just reset
 	tableView.setContentInsets({top:0},{animated:true});
 	reloading = false;
 	lastUpdatedLabel.text = "Last Updated: "+formatDate();
 	statusLabel.text = "Pull down to refresh...";
 	actInd.hide();
-	arrow.show();	*/
+	arrow.show();
 }
 
 ///////////////////////////////////////////////////////////////
