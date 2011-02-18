@@ -39,12 +39,66 @@ Titanium.Geolocation.distanceFilter = 10;
 //	url those coordinates are in line with.
 
 //
-//	Get Moving Location - This fires within every 10 meters
+//	Create Table
 //
 
-function getMovingLocation() {
+function displayItems(incomingData) {
+	for (var i = 0; i < incomingData.length; i++){
+		CustomData = incomingData[i];
 	
-Titanium.Geolocation.getCurrentPosition(function(e){
+	if(CustomData != null){
+	
+	// Create a vertical layout view to hold all the info
+	var row = Titanium.UI.createTableViewRow({
+		hasChild:true
+		});
+	//This variable will denote the audio URL from AudioURL from MySQL database	
+ 	var audioText = Titanium.UI.createLabel({
+		text: CustomData.AudioURL,
+		font: {fontSize:14,fontWeight:'bold'},
+		width: 'auto',
+		textAlign:'left',
+		top: 7,
+		height:12,
+		left:10,
+		color:'#333333'
+		});
+	//This variable will create the label that denotes Timestamp from MySQL database
+	var timeStamptext = Titanium.UI.createLabel({
+		text: CustomData.Timestamp,
+		font: {fontSize:12,fontWeight:'bold'},
+		width: 'auto',
+		textAlign:'left',
+		top: 35,
+		height:12,
+		left:10,
+		color:'#333333'
+		});
+	
+	//Declare variable "stream_URL" as an array that when "while loop" continues to fill array with audio URL location
+	var stream_url = CustomData.AudioURL;
+	var dataTimestamp = CustomData.Timestamp;
+		
+		row.add(timeStamptext);
+		row.add(audioText);
+		row.className = 'audiourl'+i;
+		row.thisStream = stream_url;
+		row.dataTimestamp = dataTimestamp;
+		//audiourls = CustomData.AudioURL;			
+		tableData.push(row);
+		i++;
+		}; //end of For loop
+		
+		tableView.setData(tableData);
+	}; //end of if statement
+}; //end of function Display Items
+
+
+//
+//	Get Moving Location - This fires within every 10 meters
+//
+	
+Titanium.Geolocation.addEventListener('location', function(e){	
 		if (!e.success || e.error)
 		{
 			Titanium.UI.createAlertDialog('error ' + JSON.stringify(e.error));
@@ -65,69 +119,14 @@ Titanium.Geolocation.getCurrentPosition(function(e){
 			Titanium.API.info('IN ERROR' + e.error);
 					};
 		///////////////////////////////////////////////////////////////////
-		try
-			{
 		xhr.onload = function(){
 		Titanium.API.info(this.responseText);
 		incomingData = JSON.parse(this.responseText);
-		for (var i = 0; i < incomingData.length; i++){
-			CustomData = incomingData[i];
+		displayItems(incomingData);
 		
-		// Create a vertical layout view to hold all the info
-		var row = Titanium.UI.createTableViewRow({
-			hasChild:true
-			});
-		//This variable will denote the audio URL from AudioURL from MySQL database	
-	 	var audioText = Titanium.UI.createLabel({
-			text: CustomData.AudioURL,
-			font: {fontSize:14,fontWeight:'bold'},
-			width: 'auto',
-			textAlign:'left',
-			top: 7,
-			height:12,
-			left:10,
-			color:'#333333'
-			});
-		//This variable will create the label that denotes Timestamp from MySQL database
-		var timeStamptext = Titanium.UI.createLabel({
-			text: CustomData.Timestamp,
-			font: {fontSize:12,fontWeight:'bold'},
-			width: 'auto',
-			textAlign:'left',
-			top: 35,
-			height:12,
-			left:10,
-			color:'#333333'
-			});
-		
-		//Declare variable "stream_URL" as an array that when "while loop" continues to fill array with audio URL location
-		var stream_url = CustomData.AudioURL;
-		var dataTimestamp = CustomData.Timestamp;
-			
-			row.add(timeStamptext);
-			row.add(audioText);
-			row.className = 'audiourl'+i;
-			row.thisStream = stream_url;
-			row.dataTimestamp = dataTimestamp;
-			
-			//audiourls = CustomData.AudioURL;			
-			tableData.push(row); 
-			}; //end of For loop
-			
-			tableView.setData(tableData);
-			
 		}; //end of onload
-				} //end of Try
-		catch(E){
-			alert(E);
-			}
-		
 		xhr.send();
 }); //end of getlocation
-}; // end of getMovingLocation();
-
-//Call get moving location function
-//getMovingLocation();
 
 //
 //	Reload Button
@@ -266,170 +265,3 @@ tableView.addEventListener('click', function(e){
 	win.setToolbar([playButton,rewindButton,flexSpace,progressBar], {translucent:true});
 	
 });
-
-/* This section is taken off because I don't want to be so fancy.
-
-
-//Established function to allow user know when last time refresh was pulled
-function formatDate()
-{
-	var date = new Date;
-	var datestr = date.getMonth()+'/'+date.getDate()+'/'+date.getFullYear();
-	if (date.getHours()>=12)
-	{
-		datestr+=' '+(date.getHours()==12 ? date.getHours() : date.getHours()-12)+':'+date.getMinutes()+' PM';
-	}
-	else
-	{
-		datestr+=' '+date.getHours()+':'+date.getMinutes()+' AM';
-	}
-	return datestr;
-}
-
-//This is the array that needs to be changed in order to accept the coordinates returned from the HTTPClient protocal
-
-win.add(tableView);
-
-var border = Ti.UI.createView({
-	backgroundColor:"#576c89",
-	height:2,
-	bottom:0
-});
-
-var tableHeader = Ti.UI.createView({
-	backgroundColor:"#e2e7ed",
-	width:320,
-	height:60
-});
-
-// fake it til ya make it..  create a 2 pixel
-// bottom border
-tableHeader.add(border);
-
-var arrow = Ti.UI.createView({
-	backgroundImage:"../images/whiteArrow.png",
-	width:23,
-	height:60,
-	bottom:10,
-	left:20
-});
-
-var statusLabel = Ti.UI.createLabel({
-	text:"Pull to reload",
-	left:55,
-	width:200,
-	bottom:30,
-	height:"auto",
-	color:"#576c89",
-	textAlign:"center",
-	font:{fontSize:13,fontWeight:"bold"},
-	shadowColor:"#999",
-	shadowOffset:{x:0,y:1}
-});
-
-var lastUpdatedLabel = Ti.UI.createLabel({
-	text:"Last Updated: "+formatDate(),
-	left:55,
-	width:200,
-	bottom:15,
-	height:"auto",
-	color:"#576c89",
-	textAlign:"center",
-	font:{fontSize:12},
-	shadowColor:"#999",
-	shadowOffset:{x:0,y:1}
-});
-
-var actInd = Titanium.UI.createActivityIndicator({
-	left:20,
-	bottom:13,
-	width:30,
-	height:30
-});
-
-tableHeader.add(arrow);
-tableHeader.add(statusLabel);
-tableHeader.add(lastUpdatedLabel);
-tableHeader.add(actInd);
-
-tableView.headerPullView = tableHeader;
-
-///////////////////////////////////////////////////////////////
-
-var pulling = false;
-var reloading = false;
-
-function beginReloading()
-{
-	// just mock out the reload
-	setTimeout(endReloading,2000);
-}
-
-///////////////////////////////////////////////////////////////
-
-function tryToReload()
-{
-
-	// when you're done, just reset
-	tableView.setContentInsets({top:0},{animated:true});
-	reloading = false;
-	lastUpdatedLabel.text = "Last Updated: "+formatDate();
-	statusLabel.text = "Pull down to refresh...";
-	actInd.hide();
-	arrow.show();
-}
-
-///////////////////////////////////////////////////////////////
-
-function endReloading()
-{
-	tryToReload();
-	// when you're done, just reset
-	tableView.setContentInsets({top:0},{animated:true});
-	reloading = false;
-	lastUpdatedLabel.text = "Last Updated: "+formatDate();
-	statusLabel.text = "Pull down to refresh...";
-	actInd.hide();
-	arrow.show();
-}
-
-///////////////////////////////////////////////////////////////
-
-tableView.addEventListener('scroll',function(e)
-{
-	var offset = e.contentOffset.y;
-	if (offset <= -65.0 && !pulling)
-	{
-		var t = Ti.UI.create2DMatrix();
-		t = t.rotate(-180);
-		pulling = true;
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Release to refresh...";
-	}
-	else if (pulling && offset > -65.0 && offset < 0)
-	{
-		pulling = false;
-		var t = Ti.UI.create2DMatrix();
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Pull down to refresh...";
-	}
-});
-
-///////////////////////////////////////////////////////////////
-
-tableView.addEventListener('scrollEnd',function(e)
-{
-	if (pulling && !reloading && e.contentOffset.y <= -65.0)
-	{
-		reloading = true;
-		pulling = false;
-		arrow.hide();
-		actInd.show();
-		statusLabel.text = "Reloading...";
-		tableView.setContentInsets({top:60},{animated:true});
-		arrow.transform=Ti.UI.create2DMatrix();
-		beginReloading();
-	}
-});
-
-*/

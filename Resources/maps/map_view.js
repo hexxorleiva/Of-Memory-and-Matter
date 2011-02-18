@@ -146,32 +146,10 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		pincolor: Titanium.Map.ANNOTATION_GREEN,
 		animate:true
 				});
-	mapView.addAnnotation(plotPoints);	
-	
-	//Here is where it will try and calculate the distance and within a certain radius it will send a POST to the server to retrieve the audio url from the database.
-	
-	var latitudeDifference = recorded.Latitude - latitude;
-	var longitudeDifference = recorded.Longitude - longitude;
-	var distanceCalculated = sqrt(Math.pow(latitudeDifference,2) + Math.pow(longitudeDifference,2));
-	if (distanceCalculated <= Math.pow(2.49, -5)) {
-		coordinateDifference = distanceCalculated;
-		} else { coordinateDifference = ''; }; // If/Else end statement
+	mapView.addAnnotation(plotPoints);
 			}; // end of for loop
 	}; // end of xhr.onload()
-	////////////////////////////////////////////////////////////////
-	//Couldn't at this point there be a return value of the "receieved.Latitude" & "receieved.Longitude" so the server doesn't have to do these math exercises also?
-	//Just return the longitude and latitude values that made the coordinateDifference happen in the first place and then make the server just match those values
-	//with the audio url and play it. A "SELECT FROM audiourl WHERE latitude && longitude == receieved.latitude && receieved.longitude"
-	if(coordinateDifference != ''){
-		var newwin = Titanium.UI.createWindow({
-		url:'memoryplayback.js',
-		backgroundColor:'Grey',
-		fullscreen:true
-	});
-		newwin.open();
-};// end of If statement
-		
-	
+	xhr.send();
 	mapView.setLocation(updatedLocation);
 });
 
