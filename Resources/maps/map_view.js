@@ -130,7 +130,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			latitudeDelta:0.005,
 			longitudeDelta:0.005
 		};
-	var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
+	var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude;
 	Titanium.API.info(geturl);
 	// Begin the "Get data" request
 	var xhr = Titanium.Network.createHTTPClient();

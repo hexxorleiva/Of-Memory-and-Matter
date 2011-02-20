@@ -72,13 +72,13 @@ function displayItems() {
 	var stream_url = CustomData.AudioURL;
 	var dataTimestamp = CustomData.Timestamp;
 		row.add(easyTime);
-		row.className = 'audiourl'+i;
+		row.className = 'audiourl';
 		row.thisStream = stream_url;
 		row.dataTimestamp = dataTimestamp;
 		//audiourls = CustomData.AudioURL;			
 		tableView.appendRow(row,{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.LEFT});
 		//tableData.push(row);
-		i++;
+		//i++;
 		}; //end of For loop
 		
 		//tableView.setData(tableData);
