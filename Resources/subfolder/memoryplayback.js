@@ -30,6 +30,7 @@ var reloadButton;
 var incomingData;
 var longitude;
 var latitude;
+var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
 
 //Location Attributes
 Titanium.Geolocation.purpose = "Recieve User Location";
@@ -99,9 +100,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		tableView.setData([]);
 		var longitude = e.coords.longitude;
 		var latitude = e.coords.latitude;
-		
-		var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude; //comparecoordinates.php
-		//Titanium.API.info(geturl);
 		// Begin the "Get data" request
 		var xhr = Titanium.Network.createHTTPClient();
 		xhr.setTimeout(20000);
@@ -142,9 +140,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 				tableView.setData([]);
 				longitude = e.coords.longitude;
 				latitude = e.coords.latitude;
-
-				var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude; //comparecoordinates.php
-				//Titanium.API.info(geturl);
 				// Begin the "Get data" request
 				var xhr = Titanium.Network.createHTTPClient();
 				xhr.setTimeout(20000);

@@ -9,6 +9,7 @@ var recorded = [];
 var plotPoints;
 var updateAnnotations;
 var uploadGPS = '';
+var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
@@ -113,7 +114,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 
 	var latitude = e.coords.latitude;
 	var longitude = e.coords.longitude;
-	var coordinateDifference = [];
 
 	var currentCoordinates = { "currentcoords": [
 				   {"latitude": latitude,
@@ -130,7 +130,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			latitudeDelta:0.005,
 			longitudeDelta:0.005
 		};
-	var geturl="http://localhost/getallaudio.php?latitude="+latitude+"longitude="+longitude;
 	Titanium.API.info(geturl);
 	// Begin the "Get data" request
 	var xhr = Titanium.Network.createHTTPClient();

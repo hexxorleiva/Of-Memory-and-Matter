@@ -76,6 +76,10 @@ var postData = {
 				//"name": audioName, //These need to be in double quotes to be accepted in the PHP script
 				"coords": uploadGPS //These need to be in double quotes to be accepted in the PHP script
 				};
+				
+var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
+//var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
+
 
 ////////////////////////////////////////////////////////////////////
 
