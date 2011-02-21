@@ -1,137 +1,101 @@
-//Changing the win to = Ti.Ui.currentWindow, just allowed me to declare anytime I wanted to modify something to appear in this window to just
-//add "win." whatever else instead of having to write "Titanium.UI.currentWindow." then "add." over and over.
+/*
+The following script showcases the Map Google API and current position of the user.
+There is also a listener event that will change the way the map behaves in accordance to
+the GPS location of the user by shifting the view to their location on "eventListener('location')"
+
+The PHP script will update the annotations on the map of the most up to date locations of other recordings.
+
+Hector Leiva - 2011
+*/
+
+//
+//	Globally Declared Variables
+//
+
+//	Decalres the scope of the window to be drawn within the selected tab that redirected here.
 var win = Titanium.UI.currentWindow;
 
+//	The coordinate variables that will constantly change throughout eventlisteners inside the script
 var latitude;
 var longitude;
+
+//	Variables that are needed to accept the incoming JSON data and create arrays needed to make map annotations
 var incomingData;
 var recorded = [];
 var plotPoints;
 var updateAnnotations;
 var uploadGPS = '';
-var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
 	isAndroid = true;
 }
-/*
-The following script showcases the Map Google API and current position of the user.
-There is also a listener event that will change the way the map behaviors in accordance to
-the GPS location of the user by shifting the view to their location on "eventListener('location')"
-
-Will be adding a PHP script that will update the annotations on the map of the most up to date locations
-of other recordings. 
-*/
 
 //
-// Begin Geo Location
+//	Begin Geo Location
 //
 
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
-Titanium.Geolocation.distanceFilter = 10;
+//	Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
+Titanium.Geolocation.distanceFilter = 100;
 
-// Start by creating the Map with these current coordinates
+//	Start by creating the Map with these current coordinates, these being specific for Baltimore, Maryland.
 var mapView = Titanium.Map.createView({
     mapType: Titanium.Map.STANDARD_TYPE,
     animate:true,
-    region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.1, longitudeDelta:0.1}, //latitude:39.30109620906199 longitude:-76.60234451293945
+    region: {latitude:39.30109620906199, longitude:-76.60234451293945, latitudeDelta:0.001, longitudeDelta:0.001}, //latitude:39.30109620906199 longitude:-76.60234451293945
     regionFit:true,
     userLocation:true,
     visible: true
 });
- 
-//THIS ONLY FIRES ONCE, ASYNC MEANING IT RUNS AND THEN EXISTS AND WON'T COME BACK. Gets the user's current location.
-/*
-Titanium.Geolocation.getCurrentPosition(function(e){
-        var region={
-            latitude: e.coords.latitude,
-            longitude: e.coords.longitude,
-            animate:true,
-            latitudeDelta:0.005,
-            longitudeDelta:0.005
-        };
-        mapView.setLocation(region);
 
-			var latitude = e.coords.latitude;
-			var longitude = e.coords.longitude;
-			var geturl="http://localhost/getcoordinates.php?latitude="+latitude+"longitude="+longitude;
-			Titanium.API.info(geturl);
-			// Begin the "Get data" request
-			var xhr = Titanium.Network.createHTTPClient();
-			xhr.setTimeout(20000);
-			xhr.open('GET', geturl, false);
-			xhr.onerror = function(e)
-				{
-				Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-				Titanium.API.info('IN ERROR' + e.error);
-				};
-			xhr.onload = function(){
-			Titanium.API.info(this.responseText);
-			incomingData = JSON.parse(this.responseText);
-			for (var i = 0; i < incomingData.length; i++){
-			recorded = incomingData[i];
-			Titanium.API.info(recorded.Latitude);
-			Titanium.API.info(recorded.Longitude);
-				plotPoints = Titanium.Map.createAnnotation({
-				latitude: recorded.Latitude,
-				longitude: recorded.Longitude,
-				title: 'Memory',
-				pincolor: Titanium.Map.ANNOTATION_GREEN,
-				animate:true
-				});
-			mapView.addAnnotation(plotPoints);
-			}; // end of for loop
-		}; // end of xhr.onload()
-		xhr.send();
-	});
- 
-win.add(mapView);
-*/
-
-//I believe when the user changes their position, the map will follow them.
+//	This will redraw the mapView map, whenever the user changes regions.
 mapView.addEventListener('regionChanged', function(e) {
-	latitude = e.latitude;
- 	longitude = e.longitude;
+	var latitude = e.latitude;
+ 	var longitude = e.longitude;
+  	var latitudeDelta = e.latitudeDelta;
+  	var longitudeDelta = e.longitudeDelta;
 });
 
 ///////////////////////////////////////////////////////////////////////
+
 //
-// If location changes 10m. Grab coordinates, update Map. If coordinates match within a certain radius of the coordinates in the database, change window to "memoryplayback.js"
+//	If location changes within 100m in any direction. Grab current coordinates, send HTTPClient request to server and redraw Map Annotations, update Map with annotations.
 //
 
 Titanium.Geolocation.addEventListener('location', function(e){
-	var region={
-        latitude: e.coords.latitude,
-        longitude: e.coords.longitude,
-        animate:true,
-        latitudeDelta:0.005,
-        longitudeDelta:0.005
-    };
-    mapView.setLocation(region);
+	
+	//	With the Geolocation triggered from a change in 100meters, Geolocation will find out the user's coordinates and set them to the global variables.
+	latitude = e.coords.latitude; 
+	longitude = e.coords.longitude;
+	
+	//	This variable will be set to react to the new region. This includes the updated Latitude and Longitude coordinate of the user and to 'animate' to the new location.
+	//	The delta values will affect how 'zoomed' the map will reset itself for the user.
+	var updatedLocation = {
+			latitude: e.coords.latitude,
+			longitude: e.coords.longitude,
+			animate:true
+			//latitudeDelta:0.005,
+			//longitudeDelta:0.005
+		};
+		mapView.setLocation(updatedLocation);
 
-	var latitude = e.coords.latitude;
-	var longitude = e.coords.longitude;
-
+	//
+	//	This URL needs to be changed according to the specific server and folder layout of scripts
+	//
+	var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
+/*
+	//	This new variable sets
 	var currentCoordinates = { "currentcoords": [
 				   {"latitude": latitude,
 				   "longitude": longitude}]
 						};
 
 	var uploadCurrentGPS = JSON.stringify(currentCoordinates);
-	
-
-	var updatedLocation = {
-			latitude: e.coords.latitude,
-			longitude: e.coords.longitude,
-			animate:true,
-			latitudeDelta:0.005,
-			longitudeDelta:0.005
-		};
-	Titanium.API.info(geturl);
-	// Begin the "Get data" request
+*/
+	//	This begins the HTTPClient request. This will send out a url as GET request to a particular PHP page and return the variables as a JSON response.
+	//	The "geturl" variable is declared with the Geolocation scope.
 	var xhr = Titanium.Network.createHTTPClient();
 	xhr.setTimeout(20000);
 	xhr.open('GET', geturl, false);
@@ -140,15 +104,18 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 		Titanium.API.info('IN ERROR' + e.error);
 				};
-	///////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	Upon getting a server response, the function will make that response equal to an array and run through the array until the response is empty.	 //
+	//	For each latitude and longitude value that is returned from the server, they will be a latitude and longitude value to set for the annotations.	 //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	xhr.onload = function(){
 	Titanium.API.info(this.responseText);
 	incomingData = JSON.parse(this.responseText);
 	
 	for (var i = 0; i < incomingData.length; i++){
 	recorded = incomingData[i];
-	Titanium.API.info(recorded.Latitude);
-	Titanium.API.info(recorded.Longitude);
+	//Titanium.API.info(recorded.Latitude);
+	//Titanium.API.info(recorded.Longitude);
 		plotPoints = Titanium.Map.createAnnotation({
 		latitude: recorded.Latitude,
 		longitude: recorded.Longitude,
@@ -160,7 +127,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			}; // end of for loop
 	}; // end of xhr.onload()
 	xhr.send();
-	mapView.setLocation(updatedLocation);
+
 });
 win.add(mapView);
 	
@@ -168,8 +135,8 @@ win.add(mapView);
 					For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
 					folder. I don't know why, but it made a clean rebuild and it started adding the bars and acknowledging the
 					"Titanium.UI.iPhone" part of the code instead of declaring it "unknown".  */
-
-				//I believe that these declare the variables without having them set to anything.
+				
+				//	Have the navigation buttons set to nothing
 				var zoomin = null;
 				var zoomout = null;
 				var testbutton = null;
@@ -187,6 +154,7 @@ win.add(mapView);
 					});
 					
 				};
+				
 			  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android
 				 phone as is and needs to be adjusted. So (!isAndroid) = if it isn't the Android OS do the following. It was important to place anyways
 				because below, the zoom-in and zoom-out buttons need to have a different method. It is "menu.add" with a title. */
@@ -206,6 +174,7 @@ win.add(mapView);
 				});
 
 				wireClickHandlers();
+				
 				/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
 				   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
 				   how much spacing is wanted. */

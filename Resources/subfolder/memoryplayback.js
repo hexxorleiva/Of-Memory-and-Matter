@@ -1,38 +1,43 @@
-/*
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	This javascript file will list any returned coordinates that are within range of the user's Latitude and Longitude. The tabelview
+//	will be established and the data will be added as long as the user is within the threshold distance of another 'memory'. Afterwards
+//	it will display the following information on each row.
+//	**Memory
+//	**Timestamp it was added (returns Datetime from MySQL)
+//	Once it returns these values it will become a button that will start the audioplayer and play the returned audio url associated 
+//	with those coordinates as a streaming element. It it important to note that it will not download it, because I want to avoid the 
+//	user having the ability to listen to the audio whenever they wish.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-This javascript file will list any returned coordinates that are within range of the user's Latitude and Longitude. The tabelview
-will be established and the data will be added as long as the user is within the threshold distance of another 'memory'. Afterwards
-it will display the following information on each row.
-**Memory
-**Timestamp it was added (returns Datetime from MySQL)
-Once it returns these values it will become a button that will start the audioplayer and play the returned audio url associated 
-with those coordinates as a streaming element. It it important to note that it will not download it, because I want to avoid the 
-user having the ability to listen to the audio whenever they wish.
-
-*/
-//Establishes the current window
+//	Decalres the scope of the window to be drawn within the selected tab that redirected here.
 var win = Titanium.UI.currentWindow;
 
-//Establishes the Table
+//	Establishes the Table
 var tableData = [];
 var CustomData = [];
 var tableView = Titanium.UI.createTableView({minRowHeight:60});
 win.add(tableView);
 
-//Establishes the audio components
+//	Establishes the audio components
 var stream_url = [];
 var audiourls = [];
 
-//Buttons
+//	Buttons
 var reloadButton;
+var stop;
 
-//Global Variables
+//	Global Variables
 var incomingData;
 var longitude;
 var latitude;
-var geturl='http://localhost/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
+var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
+var soundPlayerurl = 'http://localhost/';
 
-//Location Attributes
+//var geturl='http://hectorleiva.com/scripts/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
+//var soundPlayerurl = 'http://hectorleiva.com/scripts';
+
+//	Location Attributes
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 // Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
@@ -79,7 +84,6 @@ function displayItems() {
 		//audiourls = CustomData.AudioURL;			
 		tableView.appendRow(row,{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.LEFT});
 		//tableData.push(row);
-		//i++;
 		}; //end of For loop
 		
 		//tableView.setData(tableData);
@@ -98,11 +102,13 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		}
 		//	Clear the entire table view
 		tableView.setData([]);
-		var longitude = e.coords.longitude;
-		var latitude = e.coords.latitude;
+		longitude = e.coords.longitude;
+		latitude = e.coords.latitude;
+		var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
 		// Begin the "Get data" request
 		var xhr = Titanium.Network.createHTTPClient();
 		xhr.setTimeout(20000);
+		Titanium.API.info(geturl);
 		xhr.open('GET', geturl, false);
 		xhr.onerror = function(e)
 			{
@@ -122,7 +128,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 //
 //	Reload Button
 //
-
+/*
 	reloadButton = Titanium.UI.createButton({
 		systemButton:Titanium.UI.iPhone.SystemButton.REFRESH,
 		right:50
@@ -159,6 +165,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		}); //end of geolocation
 		Titanium.API.info('Reload Button has been pressed!');
 	});
+*/
 
 //
 //	TableView Event Listener
@@ -170,8 +177,8 @@ tableView.addEventListener('click', function(e){
 	Ti.API.info("Row object  = "+e.row);
 	Ti.API.info('http://localhost/'+e.rowData.thisStream);
 	
-	//When table view is hit, create a view that renders the rest of the options visible, but to focus on the
-	//buttons bar at the bottom.
+	//	When table view is hit, create a view that renders the rest of the options visible, but to focus on the
+	//	buttons bar at the bottom.
 	
 	//
 	//	Done System Button
@@ -192,7 +199,8 @@ tableView.addEventListener('click', function(e){
 	win.add(view);
 	
 	//	Create Sound Player
-	var soundPlayer = Titanium.Media.createSound({url: 'http://localhost/' + e.rowData.thisStream, preload:true});
+	var soundPlayer = Titanium.Media.createSound({url: soundPlayerurl + e.rowData.thisStream, preload:true});
+	Titanium.API.info(soundPlayerurl + e.rowData.thisStream);
 	var progressBar = Titanium.UI.createProgressBar({
 		min:0,
 		value:0,
@@ -209,6 +217,17 @@ tableView.addEventListener('click', function(e){
 	//	Buttons
 	//
 	
+	//	Add Stop Button
+	var pauseButton = Titanium.UI.createButton({
+		systemButton:Titanium.UI.iPhone.SystemButton.PAUSE,
+		enabled:true
+	});
+	
+	pauseButton.addEventListener('click', function() {
+		Titanium.API.info('Clicked Pause Button!');
+		soundPlayer.pause();
+	});
+	
 	//	Add Play button
 	var playButton = Titanium.UI.createButton({
 		systemButton:Titanium.UI.iPhone.SystemButton.PLAY,
@@ -219,8 +238,8 @@ tableView.addEventListener('click', function(e){
 	//	When Play button is hit, return this eventListener	
 	playButton.addEventListener('click', function() {
 		Ti.API.info('Clicked Play Button!');
-		soundPlayer.stop();
-		progressBar.value = 0;
+		//soundPlayer.stop();
+		//progressBar.value = 0;
 		soundPlayer.play();
 		progressBar.max = soundPlayer.duration;
 		});
@@ -234,7 +253,8 @@ tableView.addEventListener('click', function(e){
 	
 	rewindButton.addEventListener('click', function() {
 		Titanium.API.info('Clicked Rewind Button!');
-
+		soundPlayer.stop();
+		progressBar.value=0;
 	});
 	
 	var i = setInterval(function()
@@ -263,6 +283,7 @@ tableView.addEventListener('click', function(e){
 	soundPlayer.addEventListener('complete', function(){
 		Titanium.API.info('Complete Called');
 		progressBar.value = 0;
+		stop = true;
 	});
 	
 	//
@@ -279,7 +300,8 @@ tableView.addEventListener('click', function(e){
 		progressBar.value=0;
 	});
 	
+	
 	//	This sets the toolbar at the button and locations of where the buttons are
-	win.setToolbar([playButton,rewindButton,flexSpace,progressBar], {translucent:true});
+	win.setToolbar([playButton,pauseButton,flexSpace,progressBar,rewindButton], {translucent:true});
 	
 });
