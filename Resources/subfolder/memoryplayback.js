@@ -31,17 +31,22 @@ var stop;
 var incomingData;
 var longitude;
 var latitude;
-var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
-var soundPlayerurl = 'http://localhost/';
-
-//var geturl='http://hectorleiva.com/scripts/getallaudio.php?latitude=' + latitude + '&longitude=' + longitude;
-//var soundPlayerurl = 'http://hectorleiva.com/scripts';
+//var soundPlayerurl = 'http://localhost/'
 
 //	Location Attributes
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
-Titanium.Geolocation.distanceFilter = 10;
+// Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters. 100m = 328ft
+Titanium.Geolocation.distanceFilter = 100;
+
+//	Activity Indicator
+var actInd = Titanium.UI.createActivityIndicator({
+	bottom:10, 
+	height:50,
+	width:10,
+	zIndex:10,
+	style:Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN
+});
 
 //	Off the top we need to create a connection to the server to make sure if there is any data to be created in the rows. So once the
 //	"getCurrentPosition()" fires, it will send a call to the server to get any coordinates that match and if they do, to return the audio
@@ -104,31 +109,38 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		tableView.setData([]);
 		longitude = e.coords.longitude;
 		latitude = e.coords.latitude;
-		var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
+		//var geturl='http://localhost/memorycoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
 		// Begin the "Get data" request
-		var xhr = Titanium.Network.createHTTPClient();
-		xhr.setTimeout(20000);
-		Titanium.API.info(geturl);
-		xhr.open('GET', geturl, false);
-		xhr.onerror = function(e)
-			{
-			Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-			Titanium.API.info('IN ERROR' + e.error);
-					};
-		///////////////////////////////////////////////////////////////////
-		xhr.onload = function(){
+
+	var xhr = Titanium.Network.createHTTPClient();
+				
+	xhr.onload = function(){
+	try {
 		Titanium.API.info(this.responseText);
 		incomingData = JSON.parse(this.responseText);
 		displayItems(incomingData);
-		
-		}; //end of onload
-		xhr.send();
+		} catch (e) {
+		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+		}
+}; //end of onload
+				
+xhr.setTimeout(20000);
+				
+xhr.onerror = function(e){
+	Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+}; //end of onerror
+				
+	xhr.open('GET', geturl, false);
+	xhr.send();
+	//Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+	//Titanium.API.info('IN ERROR' + e.error);
+
 }); //end of geolocation
 
 //
 //	Reload Button
 //
-/*
+
 	reloadButton = Titanium.UI.createButton({
 		systemButton:Titanium.UI.iPhone.SystemButton.REFRESH,
 		right:50
@@ -137,35 +149,78 @@ Titanium.Geolocation.addEventListener('location', function(e){
 	
 	reloadButton.addEventListener('click', function() {
 		
-		Titanium.Geolocation.getCurrentPosition(function(e){
-				if (!e.success || e.error)
-				{
-					Titanium.UI.createAlertDialog('error ' + JSON.stringify(e.error));
-					return;
-				}
-				tableView.setData([]);
-				longitude = e.coords.longitude;
-				latitude = e.coords.latitude;
+	//	Activity Indicator
+	actInd.show();
+	
+	//	Create a view that will block out all opitions while it loads
+	var view = Titanium.UI.createView({
+		backgroundColor:'black',
+		width: 320,
+		height: 460,
+		opacity: 0.9
+	});
+	win.add(view);
+/*	
+	var xhr = Titanium.Network.createHTTPClient();
+	var geturl='http://localhost/memorycoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
+
+	xhr.onload = function(){
+	try {
+		incomingData = JSON.parse(this.responseText);
+		displayItems(incomingData);
+		
+		actInd.message = null;
+		actInd.hide();
+		win.remove(view);
+		
+			} catch (e) {
+				Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+				win.remove(view);
+				actInd.message = null;
+				actInd.hide();
+			}
+		}; //end of onload
+
+	xhr.setTimeout(20000);
+	xhr.onerror = function(e){
+		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+	}; //end of onerror
+	Titanium.API.info(incomingData);
+	xhr.open('GET', geturl, false);
+	xhr.send();
+	//Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
+	//Titanium.API.info('IN ERROR' + e.error);
+
+	//Wait 10s for response
+	Titanium.API.info('Reload Button has been pressed!');
+}); //end of reload button
+*/
+
 				// Begin the "Get data" request
 				var xhr = Titanium.Network.createHTTPClient();
 				xhr.setTimeout(20000);
+//
 				xhr.open('GET', geturl, false);
 				xhr.onerror = function(e)
 					{
 					Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
 					Titanium.API.info('IN ERROR' + e.error);
+					actInd.message = null;
+					actInd.hide();
+					win.remove(view);
 							};
 				///////////////////////////////////////////////////////////////////
 				xhr.onload = function(){
+				actInd.message = null;
+				actInd.hide();
+				win.remove(view);
 				Titanium.API.info(this.responseText);
 				incomingData = JSON.parse(this.responseText);
 				displayItems(incomingData);
 				}; //end of onload
 				xhr.send();
-		}); //end of geolocation
 		Titanium.API.info('Reload Button has been pressed!');
 	});
-*/
 
 //
 //	TableView Event Listener
@@ -176,6 +231,8 @@ tableView.addEventListener('click', function(e){
 	Titanium.API.info('item index clicked :'+e.index);
 	Ti.API.info("Row object  = "+e.row);
 	Ti.API.info('http://localhost/'+e.rowData.thisStream);
+	//Ti.API.info('http://hectorleiva.com/scripts/'+e.rowData.thisStream);
+	
 	
 	//	When table view is hit, create a view that renders the rest of the options visible, but to focus on the
 	//	buttons bar at the bottom.

@@ -1,17 +1,20 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	This section of the code will do the following:
-//	Audio:
-//	- Record an audio file with a ".mp4" extension
-//	- Playback immediate file
-//	- Send audio file to a server that will interpert through a PHP script as where to save it on the server
-//	GPS:
-//	- Log current GPS coordinates
-//	- Button press to send GPS coordinates
-//	Hector Leiva - 2011
+//	This section of the code will do the following: 															   //
+//	Audio:  																									   //
+//	- Record an audio file with a ".mp4" extension																   //
+//	- Playback immediate file																					   //
+//	- Send audio file to a server that will interpert through a PHP script as where to save it on the server       //
+//	GPS: 																										   //
+//	- Log current GPS coordinates																				   //
+//	- Button press to send GPS coordinates																		   //
+//	Hector Leiva - 2011																							   //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //	Decalres the scope of the window to be drawn within the selected tab that redirected here.
 var win = Titanium.UI.currentWindow;
+
+//	To affect where the POST operation for the PHP page will be executed, change the URL here.
+//var posturl='http://localhost/uploadingaudiocoordinates.php';
 
 //Creation of a new Directory to store both GPS and audio files. Will check if directory exists.
 var newDir = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mydir');
@@ -64,11 +67,11 @@ var coordinates = 'coordinates';
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
 //	Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
-Titanium.Geolocation.distanceFilter = 10;
+Titanium.Geolocation.distanceFilter = 100;
 
-//Getting the files - GPS
+//	Getting the files - GPS
 var gps_recorded = Titanium.Filesystem.getFile(newDir.nativePath, "coordinates.JSON");
-//Loading file into a variable
+//	Loading file into a variable
 var uploadGPS = gps_recorded.read();
 //Outputting Variable into Titanium GUI for debugging
 Titanium.API.info(uploadGPS);
@@ -82,14 +85,47 @@ var postData = {
 				//"name": audioName, //These need to be in double quotes to be accepted in the PHP script
 				"coords": uploadGPS //These need to be in double quotes to be accepted in the PHP script
 				};
-				
-//	To affect where the POST operation for the PHP page will be executed, change the URL here.
-var posturl='http://localhost/uploadingaudiocoordinates.php';
 
-////////////////////////////////////////////////////////////////////
-//	Geolocation is triggered within 10 meters. That location is written onto a writeable directory within Titanium Appcelerator's file structure
-//	and have it saved to then be uploaded whenever.
-////////////////////////////////////////////////////////////////////
+//	Labels - constantly updated by Geolocation Event Listener
+
+	updatedLocationLabel = Titanium.UI.createLabel({
+	text:'Updated Location',
+	font:{fontSize:12, fontWeight:'bold'},
+	color:'#111',
+	top:280, //Base number
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLocationLabel);
+
+	updatedLocation = Titanium.UI.createLabel({
+	text:'Updated Location not fired',
+	font:{fontSize:11},
+	color:'#444',
+	top:300, // + 20 difference
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLocation);
+
+	updatedLatitude = Titanium.UI.createLabel({
+	text:'Updated Latitude not fired',
+	font:{fontSize:11},
+	color:'#444',
+	top:320, // + 40 difference
+	left:100, //same
+	height:15, //same
+	width:300 //same
+});
+win.add(updatedLatitude);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	Geolocation is triggered within 10 meters. That location is written onto a writeable directory within Titanium Appcelerator's file structure //
+//	and have it saved to then be uploaded whenever.																								 //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Titanium.Geolocation.addEventListener('location', function(e){
 	if (!e.success || e.error)
 		{
@@ -99,6 +135,7 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			updatedLocationTime.text = '';
 			return;
 		}
+		
 	 	longitude = e.coords.longitude;
 		latitude = e.coords.latitude;
 		updatedLocation.text = 'long:' + longitude;
@@ -112,8 +149,6 @@ Titanium.Geolocation.addEventListener('location', function(e){
 		var newFile = Titanium.Filesystem.getFile(newDir.nativePath,"coordinates.JSON");
 		newFile.write(JSON.stringify(datatoWrite));
 });
-
-////////////////////////////////////////////////////////////////////
 
 //
 //	Button - Start Recording
@@ -146,7 +181,6 @@ start.addEventListener('click', function(){
 			}
 		start.title = "Start Recording";
 		Ti.Media.stopMicrophoneMonitor();
-		
 	} else {
 		
 		if (!Ti.Media.canRecord) {
@@ -156,11 +190,11 @@ start.addEventListener('click', function(){
 			}).show();
 			return;
 		}
+//	The Following Section is if the Player is recording!	//
 			start.title = "Stop Recording";
 			recording.start();
 			Ti.Media.startMicrophoneMonitor();
 			duration = 0;
-			my_timer.start();
 	}
 });
 
@@ -178,7 +212,7 @@ var b2 = Titanium.UI.createButton({
 //	Add this button to the window.
 win.add(b2);
 
-// Button - Playback Recording - Event!
+//	Button - Playback Recording - Event!
 b2.addEventListener('click', function(){
 if (file == null) 
 	{
@@ -219,7 +253,7 @@ var upload = Titanium.UI.createButton({
 	top:180
 });
 
-// Add this button to window.
+//	Add this button to window.
 win.add(upload);
 
 //	Button - Upload - Event!
@@ -230,7 +264,7 @@ if (file == null)
 		title:'Error',
 		message:'You need to record something first!'
 		}).show();
-			//return;
+			//	return;
 	} else {
 		upload.title = "Recorded: " + file.size;
 		var xhr = Titanium.Network.createHTTPClient();
@@ -243,14 +277,14 @@ if (file == null)
 		xhr.setTimeout(20000);
 		xhr.onload = function(e)
 		{
-			Titanium.UI.createAlertDialog({title:'Success', message:'Your audio has been uploaded to the server'}).show(); //message:'status code' + this.status
-			//Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
+			Titanium.UI.createAlertDialog({title:'Success', message:'Your audio has been uploaded to the server'}).show(); //	message:'status code' + this.status
+			//	Titanium.API.info('IN ONLOAD ' + this.status + ' readyState ' + this.readyState);
 		};
 		xhr.onsendstream = function(e)
 		{
-			//Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
+			//	Titanium.API.info('ONSENDSTREAM - PROGRESS: ' + e.progress);
 		};
-		//open the client
+		//	open the client
 		xhr.open('POST', posturl, false);
 		xhr.setRequestHeader("Content-Type", "audio/json");
 		xhr.send(postData);
@@ -258,139 +292,3 @@ if (file == null)
 	};
 		
 });
-
-//	Countdown timer
-	
-// interface
-
-
-
-
-
-var display_lbl =  Titanium.UI.createLabel({
-	text:"10 : 00",
-	height:80,
-	width:200,
-	top:300,
-	left:60,
-	color:'#000',
-	font:{
-		fontSize:20,
-		fontWeight:'bold'
-	},
-	textAlign:'center'
-});
-
-var start_btn = Titanium.UI.createButton({
-	title:'Start',
-	width:200,
-	height:30,
-	top:250,
-	left:60,	
-	font:{
-		fontSize:20,
-		fontWeight:'bold'
-	},
-	textAlign:'center'
-});
-
-var stop_btn = Titanium.UI.createButton({
-	title:'Stop',
-	width:200,
-	height:30,
-	top:300,
-	left:60,	
-	font:{
-		fontSize:20,
-		fontWeight:'bold'
-	},
-	textAlign:'center'
-});
-
-stop_btn.addEventListener('click',function(){
-	my_timer.stop();
-});
-
-start_btn.addEventListener('click',function(){
-	my_timer.start();
-});
-
-var countDown =  function( m , s, fn_tick, fn_end  ) {
-	return {
-		total_sec:m*60+s,
-		timer:this.timer,
-		start: function() {
-			var self = this;
-			this.timer = setInterval( function() {
-				if (self.total_sec) {
-					self.total_sec--;
-					self.time = { m : parseInt(self.total_sec/60), s: (self.total_sec%60) }; // 
-					fn_tick();
-				}
-				else {
-					self.stop();
-					fn_end();
-				}
-				}, 1000 );
-			return this;
-		},
-		stop: function() {
-			clearInterval(this.timer);
-			this.time = {m:0,s:0};
-			this.total_sec = 0;
-			return this;
-		}
-	};
-};	
-	
-
-
-
-var my_timer = new countDown(10,00, 
-		function() {
-			display_lbl.text = my_timer.time.m+" : "+my_timer.time.s;
-		},
-		function() {
-			alert("The time is up!");
-		}
-	);
-
-
-win.add(display_lbl);
-win.add(start_btn);
-win.add(stop_btn);
-
-//	Labels - constantly updated by Geolocation Event Listener
-
-	updatedLocationLabel = Titanium.UI.createLabel({
-	text:'Updated Location',
-	font:{fontSize:12, fontWeight:'bold'},
-	color:'#111',
-	top:280, //Base number
-	left:100, //same
-	height:15, //same
-	width:300 //same
-});
-win.add(updatedLocationLabel);
-
-	updatedLocation = Titanium.UI.createLabel({
-	text:'Updated Location not fired',
-	font:{fontSize:11},
-	color:'#444',
-	top:300, // + 20 difference
-	left:100, //same
-	height:15, //same
-	width:300 //same
-});
-win.add(updatedLocation);
-
-	updatedLatitude = Titanium.UI.createLabel({
-	text:'Updated Latitude not fired',
-	font:{fontSize:11},
-	color:'#444',
-	top:320, // + 40 difference
-	left:100, //same
-	height:15, //same
-	width:300 //same
-});
-win.add(updatedLatitude);

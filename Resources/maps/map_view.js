@@ -1,12 +1,12 @@
-/*
-The following script showcases the Map Google API and current position of the user.
-There is also a listener event that will change the way the map behaves in accordance to
-the GPS location of the user by shifting the view to their location on "eventListener('location')"
-
-The PHP script will update the annotations on the map of the most up to date locations of other recordings.
-
-Hector Leiva - 2011
-*/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	The following script showcases the Map Google API and current position of the user.							  //
+//	There is also a listener event that will change the way the map behaves in accordance to					  //
+//	the GPS location of the user by shifting the view to their location on "eventListener('location')"			  //
+//																												  //
+//	The PHP script will update the annotations on the map of the most up to date locations of other recordings.   //
+//																												  //
+//	Hector Leiva - 2011																							  //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
 //	Globally Declared Variables
@@ -25,6 +25,7 @@ var recorded = [];
 var plotPoints;
 var updateAnnotations;
 var uploadGPS = '';
+var annotations = [];
 
 var isAndroid = false;
 if (Titanium.Platform.name == 'android'){
@@ -37,8 +38,8 @@ if (Titanium.Platform.name == 'android'){
 
 Titanium.Geolocation.purpose = "Recieve User Location";
 Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
-//	Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters.
-Titanium.Geolocation.distanceFilter = 100;
+//	Set Distance filter. This dictates how often an event fires based on the distance the device moves. This value is in meters. 275 meters = 900 feet.
+Titanium.Geolocation.distanceFilter = 275;
 
 //	Start by creating the Map with these current coordinates, these being specific for Baltimore, Maryland.
 var mapView = Titanium.Map.createView({
@@ -50,12 +51,56 @@ var mapView = Titanium.Map.createView({
     visible: true
 });
 
+//	This function will run though the 'annotations' array() and remove them from the mapView. Then will set them to an empty array.
+function removeAnnotations(){
+    for (i=annotations.length-1;i>=0;i--) {
+        mapView.removeAnnotation(annotations[i]);
+    }
+    annotations = [];
+}
+
 //	This will redraw the mapView map, whenever the user changes regions.
 mapView.addEventListener('regionChanged', function(e) {
 	var latitude = e.latitude;
  	var longitude = e.longitude;
   	var latitudeDelta = e.latitudeDelta;
   	var longitudeDelta = e.longitudeDelta;
+
+	//	Remove any previously set up annotations
+	removeAnnotations();
+	//	Contact server
+	//var geturl='http://localhost/mappingcoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
+	Titanium.API.info('Region Changed: ' + geturl);
+	
+	var xhr = Titanium.Network.createHTTPClient();
+	xhr.setTimeout(20000);
+	xhr.open('GET', geturl, false);
+	xhr.onerror = function()
+		{
+		Titanium.UI.createAlertDialog({title:'Sorry!', message:'It seems that the server is busy, please wait.'}).show();
+		Titanium.API.info('IN ERROR' + e.error);
+				};
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	Upon getting a server response, the function will make that response equal to an array and run through the array until the response is empty.	 //
+	//	For each latitude and longitude value that is returned from the server, they will be a latitude and longitude value to set for the annotations.	 //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	xhr.onload = function(){
+	Titanium.API.info('From Map_view.js: ' + this.responseText);
+	incomingData = JSON.parse(this.responseText);
+	for (var i = 0; i < incomingData.length; i++){
+	recorded = incomingData[i];
+		plotPoints = Titanium.Map.createAnnotation({
+		latitude: recorded.Latitude,
+		longitude: recorded.Longitude,
+		title: 'Memory',
+		pincolor: Titanium.Map.ANNOTATION_GREEN,
+		animate:true
+				});
+	mapView.addAnnotation(plotPoints);
+	annotations.push(plotPoints);
+			}; // end of for loop
+	}; // end of xhr.onload()
+	xhr.send();
 });
 
 ///////////////////////////////////////////////////////////////////////
@@ -66,7 +111,7 @@ mapView.addEventListener('regionChanged', function(e) {
 
 Titanium.Geolocation.addEventListener('location', function(e){
 	
-	//	With the Geolocation triggered from a change in 100meters, Geolocation will find out the user's coordinates and set them to the global variables.
+	//	With the Geolocation triggered from a change in 275 meters, Geolocation will find out the user's coordinates and set them to the global variables.
 	latitude = e.coords.latitude; 
 	longitude = e.coords.longitude;
 	
@@ -78,114 +123,68 @@ Titanium.Geolocation.addEventListener('location', function(e){
 			animate:true
 			//latitudeDelta:0.005,
 			//longitudeDelta:0.005
-		};
+			};
 		mapView.setLocation(updatedLocation);
-
-	//
-	//	This URL needs to be changed according to the specific server and folder layout of scripts
-	//
-	var geturl='http://localhost/comparecoordinates.php?latitude=' + latitude + '&longitude=' + longitude;
-/*
-	//	This new variable sets
-	var currentCoordinates = { "currentcoords": [
-				   {"latitude": latitude,
-				   "longitude": longitude}]
-						};
-
-	var uploadCurrentGPS = JSON.stringify(currentCoordinates);
-*/
-	//	This begins the HTTPClient request. This will send out a url as GET request to a particular PHP page and return the variables as a JSON response.
-	//	The "geturl" variable is declared with the Geolocation scope.
-	var xhr = Titanium.Network.createHTTPClient();
-	xhr.setTimeout(20000);
-	xhr.open('GET', geturl, false);
-	xhr.onerror = function(e)
-		{
-		Titanium.UI.createAlertDialog({title:'Error', message:e.error}).show();
-		Titanium.API.info('IN ERROR' + e.error);
-				};
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//	Upon getting a server response, the function will make that response equal to an array and run through the array until the response is empty.	 //
-	//	For each latitude and longitude value that is returned from the server, they will be a latitude and longitude value to set for the annotations.	 //
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	xhr.onload = function(){
-	Titanium.API.info(this.responseText);
-	incomingData = JSON.parse(this.responseText);
-	
-	for (var i = 0; i < incomingData.length; i++){
-	recorded = incomingData[i];
-	//Titanium.API.info(recorded.Latitude);
-	//Titanium.API.info(recorded.Longitude);
-		plotPoints = Titanium.Map.createAnnotation({
-		latitude: recorded.Latitude,
-		longitude: recorded.Longitude,
-		title: 'Memory',
-		pincolor: Titanium.Map.ANNOTATION_GREEN,
-		animate:true
-				});
-	mapView.addAnnotation(plotPoints);
-			}; // end of for loop
-	}; // end of xhr.onload()
-	xhr.send();
-
 });
+
 win.add(mapView);
 	
 				/*  NAV BAR - Looking at making a "Re-center" button and a "Zoom-in" and "Zoom-out" button for easier navigation
 					For this to work I had to delete all the files already complied in the "build/iphone" folder within the project
 					folder. I don't know why, but it made a clean rebuild and it started adding the bars and acknowledging the
 					"Titanium.UI.iPhone" part of the code instead of declaring it "unknown".  */
-				
-				//	Have the navigation buttons set to nothing
-				var zoomin = null;
-				var zoomout = null;
-				var testbutton = null;
+//	Have the navigation buttons set to nothing
+var zoomin = null;
+var zoomout = null;
+var testbutton = null;
 				
 				/*I have no idea what the "wireClickHandlers" function is suppose to do; I copied this code from the Maps example
 				  from the Titanium Appcelerator KitchenSink. I think these just make the "zoom" variables become functions that
 				  affect the mapview - and that the "mapview.zoom" part actually details how it changes the map itself.*/
 
-				var wireClickHandlers = function() {
-					zoomin.addEventListener('click',function() {
-						mapView.zoom(1);
-					});
-					zoomout.addEventListener('click',function() {
-						mapView.zoom(-1);
-					});
+var wireClickHandlers = function() {
+	zoomin.addEventListener('click',function() {
+	mapView.zoom(1);
+	});
+	zoomout.addEventListener('click',function() {
+	mapView.zoom(-1);
+	});
 					
-				};
+};
 				
 			  /* This statement is just in place because the "remove all" button (from the Maps example in the Kitchen Sink) won't work on the Android
 				 phone as is and needs to be adjusted. So (!isAndroid) = if it isn't the Android OS do the following. It was important to place anyways
 				because below, the zoom-in and zoom-out buttons need to have a different method. It is "menu.add" with a title. */
-		if (!isAndroid) {
-				var flexSpace = Titanium.UI.createButton({
-					systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-				});
+		
+if (!isAndroid) {
+	var flexSpace = Titanium.UI.createButton({
+	systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+	});
 
-				zoomin = Titanium.UI.createButton({
-					title:'Zoom +',
-					style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-				});
+	zoomin = Titanium.UI.createButton({
+	title:'Zoom +',
+	style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+	});
 
-				zoomout = Titanium.UI.createButton({
-					title:'Zoom -',
-					style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-				});
+	zoomout = Titanium.UI.createButton({
+	title:'Zoom -',
+	style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+	});
 
-				wireClickHandlers();
+	wireClickHandlers();
 				
 				/* The usage of "flexspace" below fills in the gaps. Since I placed a "flexspace" before the other identified buttons, it pushed those
 				   buttons all the way to the right. If I wanted to add another button for any reason, just make sure to identify it and then determine
 				   how much spacing is wanted. */
-				win.setToolbar([flexSpace,zoomin,zoomout]);
+				
+	win.setToolbar([flexSpace,zoomin,zoomout]);
 
-		} else {
-			var activity = Titanium.Android.currentActivity;
-			activity.onCreateOptionsMenu = function() {
-				var menu = e.menu;
-				zoomin = menu.add({title : "Zoom In"});
-				zoomout = menu.add({title : "Zoom Out"});
-				wireClickHandlers();
-			};
-		};
+	} else {
+	var activity = Titanium.Android.currentActivity;
+	activity.onCreateOptionsMenu = function() {
+	var menu = e.menu;
+	zoomin = menu.add({title : "Zoom In"});
+	zoomout = menu.add({title : "Zoom Out"});
+	wireClickHandlers();
+	};
+};

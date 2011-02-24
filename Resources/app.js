@@ -13,7 +13,6 @@ newDir.createDirectory();
 Titanium.API.info('Path to newdir: ' + newDir.nativePath);
 };
 
-
 //
 // create base UI tab and root window
 //
@@ -53,14 +52,8 @@ var win2 = Titanium.UI.createWindow({
 	url:'maps/map_view.js',
 	title:'Map',
 	backgroundColor:'#000'
-});
-
+	});
 win2.open();
-
-Titanium.App.addEventListener('openwindow', function(e){
-	var win = Titanium.UI.createWindow(e.option);
-	win.open();
-});
 
 var tab2 = Titanium.UI.createTab({
 	id:'tab2',
@@ -84,8 +77,8 @@ win2.add(label2);
 
 var win3 = Titanium.UI.createWindow({
 	id:'win3',
-	url:'subfolder/gps_soundrecordupload.js', //sound_record3.js
-	title:'Recording Sound',
+	url:'subfolder/gps_soundrecordupload.js',
+	title:'Sound Record',
 	backgroundColor:'#fff'
 });
 var tab3 = Titanium.UI.createTab({
